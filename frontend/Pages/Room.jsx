@@ -18,7 +18,7 @@ export default function Room() {
     console.log("Incoming Call from:", from, offer)
     const ans = await createAnswer(offer)
     socket.emit("call-accepted", { email: from, ans })
-  }, [createAnswer, socket])
+  },[socket, createAnswer])
 
   const handleCallAccepted = useCallback(async (data) => {
     const { ans } = data
@@ -32,26 +32,31 @@ export default function Room() {
       video: true
     })
     setMyStream(stream)
-  }, [])
+  }, [handleNewUserJoined, handleIncomingCall, handleCallAccepted, socket])
 
   useEffect(() => {
-    socket.on("user-joined", handleNewUserJoined)
-    socket.on("incoming-call", handleIncomingCall)
-    socket.on("call-accepted", handleCallAccepted)
-    getUserMediaStream();
+  console.log("Attaching socket listeners", socket.id);
 
-    return () => {
-      socket.off('user-joined', handleNewUserJoined)
-      socket.off('incoming-call', handleIncomingCall)
-      socket.off('call-accepted', handleCallAccepted)
-    }
-  }, [socket, handleNewUserJoined, handleIncomingCall, handleCallAccepted, getUserMediaStream])
+  socket.on("user-joined", handleNewUserJoined);
+  console.log("Client socket ID:", socket.id);
+  socket.on("incoming-call", handleIncomingCall);
+  socket.on("call-accepted", handleCallAccepted);
 
+  return () => {
+    
+    socket.off("incoming-call", handleIncomingCall);
+    socket.off("call-accepted", handleCallAccepted);
+  };
+  
+}, [socket, handleNewUserJoined, handleCallAccepted, handleIncomingCall]);
+
+useEffect(() => {
+getUserMediaStream()
+},[])
   return (
     <div>
       <p>This is Room Page.</p>
 
-      {/* Replace ReactPlayer with native <video> */}
       <video
         autoPlay
         playsInline
