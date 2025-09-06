@@ -1,4 +1,4 @@
-import React,{useMemo, createContext, useEffect, useState} from 'react'
+import React,{useMemo, createContext, useEffect, useState, useCallback, useRef} from 'react'
 
 const GlobalContext = createContext(null)
 
@@ -8,6 +8,7 @@ export const usePeer = () => {
 
 export default function PeerProvider({children}) {
   const [remoteStream, setRemoteStream] = useState(null)
+  const remoteMediaStream = useRef(new MediaStream());
   
   const Peer = useMemo(
     () => 
@@ -39,33 +40,18 @@ export default function PeerProvider({children}) {
     await Peer.setRemoteDescription(new RTCSessionDescription(ans));
   }
 
-  const sendStream = async (stream) => {
-  if (!stream) return;
-
+  function sendStream(stream) {
   stream.getTracks().forEach(track => {
-    const alreadyAdded = Peer.getSenders().some(sender => sender.track === track);
+    const alreadyAdded = Peer.getSenders().find(sender => sender.track === track);
     if (!alreadyAdded) {
       Peer.addTrack(track, stream);
     }
   });
-};
+}
 
 
-  const handleTrackEvent = (ev) => {
-      const streams = ev.streams
-      setRemoteStream(streams[0])
-    }
+
   
-  
-
-  useEffect(() => {
-    Peer.addEventListener('track', handleTrackEvent)
-    
-
-    return () => {
-      Peer.removeEventListener('track', handleTrackEvent)
-    }
-  })
   return <GlobalContext.Provider value={{Peer, createOffer, createAnswer, setRemoteAnswer, sendStream, remoteStream, setRemoteStream}}>
     {children}
   </GlobalContext.Provider>
