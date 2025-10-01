@@ -46,13 +46,21 @@ export default function Authentication() {
     }
   }
   const handleLogin = async () => {
+    if (logEmail === "" || logPass === "") {
+  setErrorMsg("Fill all details");
+  setShowError(true);
+  setTimeout(() => {
+    setShowError(false);
+  }, 3000);
+}
     const response = await axios.post("http://localhost:8000/api/authentication/login", {
       email: logEmail,
       password: logPass
     });
 
-    if (response.data.message === "User Found") {
-      console.log("User Found:", response.data.newUser);
+    if (response.data.message === "Authentication Succesfull") {
+      console.log("User Found:", response.data.token);
+      await localStorage.setItem("token", response.data.token);
       navigate('/verification', {
         state: {
           email: logEmail
