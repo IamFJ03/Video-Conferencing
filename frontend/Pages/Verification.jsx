@@ -54,11 +54,11 @@ export default function Verification()  {
                 otp: otp
             });
 
-            if (response.data && response.data.message === "Verification successful! User is now active.") {
+            if (response.data && response.data.message === "User is Identified") {
                 setMessage('Account verified successfully! Redirecting to login...');
                 setLoading(false);
                 setTimeout(() => {
-                    navigate('/login');
+                    navigate('/dashboard');
                 }, 2000);
             } else {
                 setMessage(response.data?.message || 'Verification failed. Please try again.');
@@ -115,7 +115,7 @@ export default function Verification()  {
 
             <form onSubmit={handleVerifyOTP} style={styles.form}>
                 <input
-                    type="text"
+                    type="number"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     maxLength={6}
