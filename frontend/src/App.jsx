@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import './App.css'
+import Authentication from '../Pages/Authentication';
+import Verification from '../Pages/Verification';
 import Home from '../Pages/Home'
 import Room from '../Pages/Room'
 import Socket from '../Provider/Socket'
@@ -11,11 +13,13 @@ function App() {
   return (
     <Socket>
       <PeerProvider>
-    <Routes>
-      <Route path='/' element={<Home/>} />
-      <Route path='/room/:roomId' element={<Room/>} />
-    </Routes>
-    </PeerProvider>
+        <Routes>
+          <Route path='/' element={<Authentication />} />
+          <Route path='/verification' element={<Verification />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/room/:roomId' element={<Room />} />
+        </Routes>
+      </PeerProvider>
     </Socket>
   )
 }

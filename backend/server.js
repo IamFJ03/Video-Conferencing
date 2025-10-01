@@ -1,11 +1,16 @@
-const express = require("express")
-const { Server } = require("socket.io")
-const bodyParser = require("body-parser")
+import express from "express";
+import {connectDB} from "./connection.js";
+import { Server } from "socket.io";
+import auth from "./routes/auth.routes.js";
+import bodyParser from "body-parser";
+import cors from "cors";
 const io = new Server({
    cors: true
 })
 const app = express()
-
+app.use(cors())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const emailToSocketMapping = new Map()
 const socketToEmailMapping = new Map()
@@ -46,5 +51,11 @@ io.on("connection", (socket) => {
       socket.to(socketId).emit("call-accepted", { ans })
    })
 })
-app.listen(8000, () => console.log("Server started at port 8000"))
+
+app.use("/api/authentication", auth);
+
+app.listen(8000, () => {
+   connectDB()
+   console.log("Server started at port 8000")
+})
 io.listen(8001)
