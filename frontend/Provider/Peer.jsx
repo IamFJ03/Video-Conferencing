@@ -49,9 +49,6 @@ export default function PeerProvider({children}) {
   });
 }
 
-
-
-  
   return <GlobalContext.Provider value={{Peer, createOffer, createAnswer, setRemoteAnswer, sendStream, remoteStream, setRemoteStream}}>
     {children}
   </GlobalContext.Provider>

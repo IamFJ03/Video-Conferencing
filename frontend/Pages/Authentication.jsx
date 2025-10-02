@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUserContext } from '../Provider/UserContext';
 
 export default function Authentication() {
   const [viewType, setViewType] = useState("login");
@@ -10,6 +11,7 @@ export default function Authentication() {
   const [username, setUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
+  const {user, setUser} = useUserContext();
   const navigate = useNavigate();
   const handleSignUp = async () => {
     try {
@@ -59,7 +61,8 @@ export default function Authentication() {
     });
 
     if (response.data.message === "Authentication Succesfull") {
-      console.log("User Found:", response.data.token);
+      console.log("User Found:", response.data.newUser);
+      setUser(response.data.newUser);
       await localStorage.setItem("token", response.data.token);
       navigate('/verification', {
         state: {

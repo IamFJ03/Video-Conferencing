@@ -35,7 +35,7 @@ const login = async (req, res) => {
         if (user) {
             const USER = {id: user.id, username: user.Username, email: user.Email, password: user.password};
             const token = jwt.sign(USER, jwtKey, {expiresIn:'24h'}, (err, token) => {
-                res.json({message:"Authentication Succesfull",token});
+                res.json({message:"Authentication Succesfull",token, newUser: USER});
             })
             const otp = otpGenerator.generate(6, { digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false })
             const otpExpires = new Date(Date.now() + 5 * 60 * 1000);

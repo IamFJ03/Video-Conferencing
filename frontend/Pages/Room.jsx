@@ -11,9 +11,8 @@ export default function Room() {
   const remoteVideoRef = useRef(null);
 
   const { socket } = useSocket();
-  const { Peer } = usePeer(); // assume Peer is your RTCPeerConnection
+  const { Peer } = usePeer();
 
-  // --- local media setup ---
   const getUserMediaStream = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -21,11 +20,9 @@ export default function Room() {
     });
     setMyStream(stream);
 
-    // attach local tracks to peer
     stream.getTracks().forEach((track) => Peer.addTrack(track, stream));
   }, [Peer]);
 
-  // --- socket event handlers ---
   const handleNewUserJoined = useCallback(
     async ({ email }) => {
       console.log("New User ", email, " joined");
@@ -61,7 +58,6 @@ export default function Room() {
     [Peer]
   );
 
-  // --- handle remote tracks ---
   useEffect(() => {
     Peer.ontrack = (ev) => {
       console.log("📡 Remote track received:", ev.streams[0]);
@@ -69,7 +65,6 @@ export default function Room() {
     };
   }, [Peer]);
 
-  // --- negotiationneeded handler (for ICE restarts / renegotiation) ---
   useEffect(() => {
     const handleNegotiation = async () => {
       console.log("⚡ negotiationneeded");
@@ -86,7 +81,6 @@ export default function Room() {
     };
   }, [Peer, remoteEmail, socket]);
 
-  // --- socket listeners ---
   useEffect(() => {
     console.log("Attaching socket listeners", socket.id);
 
@@ -101,12 +95,10 @@ export default function Room() {
     };
   }, [socket, handleNewUserJoined, handleIncomingCall, handleCallAccepted]);
 
-  // --- init local stream ---
   useEffect(() => {
     getUserMediaStream();
   }, [getUserMediaStream]);
 
-  // --- bind video refs ---
   useEffect(() => {
     if (localVideoRef.current && myStream) {
       localVideoRef.current.srcObject = myStream;
