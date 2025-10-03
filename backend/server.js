@@ -2,6 +2,7 @@ import express from "express";
 import {connectDB} from "./connection.js";
 import { Server } from "socket.io";
 import auth from "./routes/auth.routes.js";
+import person from './routes/user.routes.js';
 import bodyParser from "body-parser";
 import cors from "cors";
 const io = new Server({
@@ -53,6 +54,7 @@ io.on("connection", (socket) => {
 })
 
 app.use("/api/authentication", auth);
+app.use("/api/user", person);
 
 app.listen(8000, () => {
    connectDB()

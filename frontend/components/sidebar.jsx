@@ -16,7 +16,7 @@ export default function sidebar() {
             </li>
             <li className='flex flex-row items-center'>
               <Settings color="white" size={20} strokeWidth={1.5} className='mr-2' />
-              <span><Link to="">Setting</Link></span>
+              <span><Link to="/setting">Setting</Link></span>
             </li>
             <li className='pt-10 flex flex-row items-center'>
               <User color="white" size={20} strokeWidth={1.5} className='mr-2' />
