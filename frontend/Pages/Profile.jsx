@@ -3,15 +3,35 @@ import Sidebar from '../components/sidebar'
 import { useUserContext } from '../Provider/UserContext'
 import { UserCircle2Icon, MailIcon } from 'lucide-react';
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
 export default function Profile() {
+  const [userData, setUserData] = useState({});
   const { user } = useUserContext();
   const [fullName, setFullName] = useState("");
   useEffect(() => {
     const fetchedUser = () => {
       console.log("User:", user);
     }
+
+    const fetchData = async () => {
+      const token = await localStorage.getItem("token");
+      const response = await axios.post('http://localhost:8000/api/user/fetchData',{},{
+        headers:{
+          "Authorization": `Bearer ${token}`
+        }
+      });
+    
+      if(response.data.message==="User Data Fetched"){
+        console.log("User Data:", response.data.user);
+        setUserData(response.data.user);
+      }
+      else
+        console.log("User Data not found");
+    }
+
     fetchedUser();
+    fetchData();
   }, [])
   return (
     <div className='flex bg-gray-50 w-342 bottom-8 relative'>
@@ -41,31 +61,31 @@ export default function Profile() {
             <div className='flex justify-between px-20 mb-10'>
               <div>
               <p className='text-left mb-2 font-bold'>Full Name:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.fullName ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
               <div>
               <p className='text-left mb-2 font-bold'>Nick Name:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.nickName ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
             </div>
             <div className='flex justify-between px-20 mb-10'>
               <div>
               <p className='text-left mb-2 font-bold'>Gender:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.gender ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
               <div>
               <p className='text-left mb-2 font-bold'>Country:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.country ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
             </div>
             <div className='flex justify-between px-20 mb-10'>
               <div>
               <p className='text-left mb-2 font-bold'>Language:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.language ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
               <div>
               <p className='text-left mb-2 font-bold'>Contact No:</p>
-              <input value={fullName === "" ? "nill" : fullName} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
+              <input value={userData.contact ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
               </div>
             </div>
           </div>

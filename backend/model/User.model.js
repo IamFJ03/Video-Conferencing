@@ -13,7 +13,7 @@ const PersonSchema = new mongoose.Schema({
         type: String,
         required:false
     },
-    Gender:{
+    gender:{
         type: String,
         required:false
     },

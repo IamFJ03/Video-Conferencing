@@ -33,7 +33,7 @@ const login = async (req, res) => {
     try {
         let user = await User.findOne({ Email: email });
         if (user) {
-            const USER = {id: user.id, username: user.Username, email: user.Email, password: user.password};
+            const USER = {id: user._id, username: user.Username, email: user.Email, password: user.password};
             const token = jwt.sign(USER, jwtKey, {expiresIn:'24h'}, (err, token) => {
                 res.json({message:"Authentication Succesfull",token, newUser: USER});
             })

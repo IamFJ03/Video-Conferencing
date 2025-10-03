@@ -29,6 +29,10 @@ try{
       "Authorization": `Bearer ${token}`
     }
   });
+  if(response.data.message==="User Updated")
+    console.log("Updated:", response.data.user)
+  else
+    console.log("Created Succesfully", response.data.user);
 }
 catch(e){
 
