@@ -8,6 +8,11 @@ export default function Setting() {
   const [country, setCountry] = useState("");
   const [language, setLanguage] = useState("");
   const [contact, setContact] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
+
+  const handleFileChange = (e) => {
+    setProfilePicture(e.target.files[0])
+  }
 
   const handleSave = async () => {
     const token = await localStorage.getItem('token');
@@ -18,6 +23,9 @@ export default function Setting() {
     formData.append('country', country);
     formData.append('language', language);
     formData.append('contact', contact);
+    if(profilePicture)
+      formData.append('profilePicture', profilePicture);
+    
     const data = {};
 formData.forEach((value, key) => {
   data[key] = value;
@@ -67,6 +75,10 @@ catch(e){
               </form>
             </div>
             <div>
+            <form className='rounded w-110 py-10 bg-gray-200'>
+                <p className='text-left text-xl'>Upload Profile Picture</p>
+                <input type='file' accept='image/*' onChange={handleFileChange} />
+              </form>
               <p className='text-xl mb-5 text-left'>Change Password</p>
               <form className='rounded w-110 py-10 bg-gray-200'>
                 <p className='text-lg text-left px-5'>Current Password:</p>

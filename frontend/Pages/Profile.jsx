@@ -39,11 +39,17 @@ export default function Profile() {
         <Sidebar />
       </div>
       <div>
-        <div className='w-270 h-160 bg-white mt-10 rounded-3xl shadow-2xl ml-[-50px]'>
+        <div className='w-270 h-170 bg-white mt-10 rounded-3xl shadow-2xl ml-[-50px]'>
           <div className='flex items-center justify-between px-20 mb-10'>
             <div className='flex items-center py-5'>
               <div>
-                <UserCircle2Icon color='black' size={45} strokeWidth={1.5} />
+                {userData.profilePicture ? 
+                <>
+              <img src={`http://localhost:8000/profile-picture/${userData.profilePicture}`} className='h-25 w-25 rounded-full' />
+              </>
+              :
+              <UserCircle2Icon color='black' size={45} strokeWidth={1.5} />  
+              }
               </div>
               <div className='ml-2'>
                 <p className='font-bold text-lg text-left'>{user.username}</p>

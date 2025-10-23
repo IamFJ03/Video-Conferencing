@@ -9,6 +9,8 @@ import Room from '../Pages/Room';
 import Profile from '../Pages/Profile';
 import Schedule from '../Pages/Schedule';
 import Setting from '../Pages/Setting';
+import NewMeeting from '../Pages/NewMeeting';
+
 import Socket from '../Provider/Socket'
 import PeerProvider from '../Provider/Peer'
 import {UserContext} from '../Provider/UserContext';
@@ -22,10 +24,11 @@ function App() {
             <Route path='/' element={<Authentication />} />
             <Route path='/verification' element={<Verification />} />
             <Route path='/join-meeting' element={<Home />} />
-            <Route path='/home' element={<Dashboard />} />
+            <Route path='/home/:email' element={<Dashboard />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/schedule' element={<Schedule />} />
             <Route path='/setting' element={<Setting />} />
+            <Route path='/create-meeting' element={<NewMeeting />} />
             <Route path='/room/:roomId' element={<Room />} />
           </Routes>
         </UserContext>

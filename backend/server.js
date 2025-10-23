@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import auth from "./routes/auth.routes.js";
 import person from './routes/user.routes.js';
 import bodyParser from "body-parser";
+import path from "path";
 import cors from "cors";
 const io = new Server({
    cors: true
@@ -55,6 +56,7 @@ io.on("connection", (socket) => {
 
 app.use("/api/authentication", auth);
 app.use("/api/user", person);
+app.use('/profile-picture', express.static(path.join(process.cwd(), 'profile-picture')));
 
 app.listen(8000, () => {
    connectDB()

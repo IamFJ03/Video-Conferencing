@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 import { Person } from "../model/User.model.js";
+import multer from 'multer';
+import express from 'express';
 
 const SaveUser = async (req, res) => {
     const { fullname, nickname, gender, country, language, contact } = req.body;
+    const profilePictureFilename = req.file ? req.file.filename : null;
 
   console.log('Full Name:', fullname);
   console.log('Nick Name:', nickname);
@@ -10,12 +13,25 @@ const SaveUser = async (req, res) => {
   console.log('Country:', country);
   console.log('Language:', language);
   console.log('Contact:', contact);
-  console.log("User:",req.user)
+  console.log("User:",req.user);
+  console.log("Picture:", profilePictureFilename);
   const userId = new mongoose.Types.ObjectId(req.user.id);
+  const updateData = {
+    fullName: fullname,
+    nickName: nickname, 
+    gender, 
+    country, 
+    language, 
+    contact
+  }
+
+  if(profilePictureFilename)
+    updateData.profilePicture = profilePictureFilename;
+
   const search = await Person.findOne({id: userId});
   if(search){
    const newPerson = await Person.findOneAndUpdate({id: userId},{
-    $set: {fullName: fullname, nickName: nickname, gender, country, language, contact}
+    $set: {...updateData}
    },
   { new: true }
 );
@@ -23,7 +39,7 @@ const SaveUser = async (req, res) => {
    res.json({message:"User Updated", user: newPerson});
   }
   else{
-    const person = new Person({ id: req.user.id, fullName: fullname, nickName: nickname, gender: gender, country: country, language, contact});
+    const person = new Person({ id: req.user.id, ...updateData});
     await person.save();
     res.json({message:"User Profile Saved", user: person})
   }
