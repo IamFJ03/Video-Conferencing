@@ -1,10 +1,11 @@
-import React from 'react'
+import React from 'react';
+import Sidebar from '../components/sidebar';
 
 export default function Schedule() {
   return (
     <div>
-      <div>
-        <p>This is my Schedule Page</p>
+      <div className='flex'>
+        <Sidebar />
       </div>
     </div>
   )
