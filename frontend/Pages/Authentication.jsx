@@ -86,12 +86,12 @@ export default function Authentication() {
       {viewType === "login" ?
         (
           <div>
-            <div className='w-80 h-100 rounded-2xl py-4 shadow-2xl mt-20'>
+            <div className=' h-120 rounded-2xl p-15 shadow-2xl mt-20'>
               <p className='text-black font-bold text-2xl'>Welcome Back!</p>
               <p className='text-gray-400'>Log In to have video conference</p>
-              <p className='text-left ml-5 pt-5 text-lg'>Email:</p>
+              <p className='text-left pt-5 mb-2 text-lg'>Email:</p>
               <input placeholder='Enter Email' type='email' className='border-1 w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
-              <p className='text-left ml-5 pt-5 text-lg'>Password:</p>
+              <p className='text-left mb-2 pt-5 text-lg'>Password:</p>
               <input placeholder='Enter Password' type='password' className='border-1 w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
               <button className='bg-gray-900 text-white my-5 py-2 w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
               <span>Don't have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("signup")}>Sign Up</span>
@@ -101,14 +101,14 @@ export default function Authentication() {
         )
         :
         (
-          <div className='w-90 h-130 rounded-2xl py-8 shadow-2xl mt-20'>
+          <div className='w-100 h-140 rounded-2xl p-10 shadow-2xl mt-20'>
             <p className='text-black font-bold text-2xl'>Welcome to MeetConf</p>
             <p className='text-gray-400'>Sign Up to have video conferencing with close ones, meet ups etc.</p>
-            <p className='text-left ml-10 pt-5 text-lg'>UserName:</p>
+            <p className='text-left ml-5 pt-5 mb-2 text-lg'>UserName:</p>
             <input placeholder='Enter Username' type='text' className='border-1 w-70 py-1 px-2 rounded' value={username} onChange={(e) => setUsername(e.target.value)} />
-            <p className='text-left ml-10 pt-5 text-lg'>Email:</p>
+            <p className='text-left ml-5 pt-5 mb-2 text-lg'>Email:</p>
             <input placeholder='Enter Email' type='email' className='border-1 w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
-            <p className='text-left ml-10 pt-5 text-lg'>Password:</p>
+            <p className='text-left ml-5 mb-2 pt-5 text-lg'>Password:</p>
             <input placeholder='Enter Password' type='password' className='border-1 w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
             <button className='bg-gray-900 text-white my-5 py-2 w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
             <span>Already have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("login")}>Log In</span>

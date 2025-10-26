@@ -1,8 +1,6 @@
 import express from "express";
 import multer from "multer";
 import { Authenticate } from "../controller/auth.controller.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
 const app = express();
 
 const storage = multer.diskStorage({

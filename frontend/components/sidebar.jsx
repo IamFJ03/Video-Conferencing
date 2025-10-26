@@ -12,7 +12,7 @@ export default function sidebar() {
             </li>
             <li className='py-10 flex flex-row items-center'>
               <Calendar color="white" size={20} strokeWidth={1.5} className='mr-2' />
-              <span><Link to="/schedule"> Schedule</Link></span>
+              <span><Link to="/schedule"> Schedules</Link></span>
             </li>
             <li className='flex flex-row items-center'>
               <Settings color="white" size={20} strokeWidth={1.5} className='mr-2' />
