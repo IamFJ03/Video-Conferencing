@@ -21,7 +21,7 @@ export default function Dashboard() {
           </div></Link>
           <Link to={"/schedule"}><div className='h-50 min-w-70 bg-black rounded-2xl flex flex-col items-center justify-center hover:shadow-2xl mt-[-200px] hover:mt-[-220px] duration-500 hover:cursor-pointer'>
             <Calendar color='white' size={50} strokeWidth={1.5} />
-            <p className='text-white text-3xl'>Schedule</p>
+            <p className='text-white text-3xl'>Schedules</p>
           </div></Link>
           <Link ><div className='flex flex-col h-50 min-w-70  bg-black rounded-2xl items-center justify-center hover:shadow-2xl mt-[-200px] hover:mt-[-220px] duration-500 hover:cursor-pointer'>
             <Users color='white' size={50} strokeWidth={1.5} />

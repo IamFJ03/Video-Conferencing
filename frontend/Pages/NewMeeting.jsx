@@ -11,40 +11,42 @@ export default function NewMeeting() {
   const [link, setLink] = useState("");
   const [description, setDescription] = useState("");
   const [errorMsg, setErrorMsg] = useState("")
-  const [modal, setModal] = useState(false); 
+  const [modal, setModal] = useState(false);
   const { user } = useUserContext();
 
   const handleSave = async () => {
     console.log("Title:", title, "date:", date, "Time:", time, "Link:", link, "Description:", description);
-    if(title==="" || date==="" || time==="" || link==="" || description===""){
+    if (title === "" || date === "" || time === "" || link === "" || description === "") {
       setErrorMsg("All Fields are required!!")
       setTimeout(() => {
         setErrorMsg("");
       }, 3000);
     }
-    else{
+    else {
       console.log(user.username);
-    setModal(true); 
-  const formdata = new FormData();
+      setModal(true);
+      const dateOnly = date.substring(0, 10);
+      const formdata = new FormData();
       formdata.append('title', title);
-      formdata.append('date', date);
+      formdata.append('date', dateOnly);
       formdata.append('time', time);
       formdata.append('link', link);
       formdata.append('description', description);
       formdata.append('username', user.username);
-      try{
+      try {
         console.log("Sending data")
         const response = await axios.post('http://localhost:8000/api/meeting/info',
           formdata
         );
-        if(response.data.status==="Schedule added")
+        if (response.data.status === "Schedule added")
           console.log("Meeting Scheduled", response.data.info);
+
       }
-      catch(e){
-        console.log("Error",e);
+      catch (e) {
+        console.log("Error", e);
       }
+    }
   }
-}
 
   const handleCancel = () => {
     setDate("");
@@ -53,10 +55,15 @@ export default function NewMeeting() {
     setLink("");
     setDescription("");
   }
-  
+
 
   const handleCloseModal = () => {
     setModal(false);
+    setDate("");
+    setTitle("");
+    setTime("");
+    setLink("");
+    setDescription("");
   }
 
   return (
@@ -81,30 +88,30 @@ export default function NewMeeting() {
       </div>
 
       {modal &&
-       
+
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center' onClick={handleCloseModal}>
-         
+
           <div className='relative shadow-2xl text-left w-96 bg-white p-8 rounded-lg' onClick={(e) => e.stopPropagation()}>
             <p className='font-bold text-2xl mb-4'>Meeting Details</p>
-         
-            <button 
-                className='absolute top-3 right-3 text-gray-500 hover:text-gray-900' 
-                onClick={handleCloseModal}
+
+            <button
+              className='absolute top-3 right-3 text-gray-500 hover:text-gray-900'
+              onClick={handleCloseModal}
             >
-                <X size={24}/>
+              <X size={24} />
             </button>
-            
+
             <p className='mb-1'><span className='font-semibold'>Title:</span> {title}</p>
             <p className='mb-1'><span className='font-semibold'>Date:</span> {date}</p>
             <p className='mb-1'><span className='font-semibold'>Time:</span> {time}</p>
             <p className='mb-1'><span className='font-semibold'>Link:</span> {link}</p>
             <p className='mb-4'><span className='font-semibold'>Description:</span> {description}</p>
-            
-            <button 
-                className='w-full py-2 rounded font-bold text-white bg-black mt-2' 
-                onClick={handleCloseModal}
+
+            <button
+              className='w-full py-2 rounded font-bold text-white bg-black mt-2'
+              onClick={handleCloseModal}
             >
-                Confirm and Close
+              Confirm and Close
             </button>
           </div>
         </div>

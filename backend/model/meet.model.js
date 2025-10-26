@@ -13,6 +13,9 @@ const meetInfoSchema = mongoose.Schema({
 
     date:{
         type: Date,
+        get: (date) => {
+          return date ? date.toISOString().substring(0,10) : date
+        },
         required: false
     },
     time:{
@@ -27,7 +30,11 @@ const meetInfoSchema = mongoose.Schema({
         type: String,
         required: false
     },
-})
+}, {
+   
+    toJSON: { getters: true },
+    toObject: { getters: true }
+});
 
 const meetInfo = new mongoose.model('meeting', meetInfoSchema)
 export{meetInfo};

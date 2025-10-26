@@ -59,7 +59,7 @@ catch(e){
             <div className='flex items-center justify-between px-20'>
             <div className=' text-left mt-10'>
               <p className='text-xl'>Edit Profile</p>
-              <form className=' h-120 px-5 mt-5 rounded bg-gray-200 '>
+              <form className=' h-120 px-5 mt-5 rounded bg-gray-200 shadow-2xl'>
                  <p className='text-lg pt-5'>Full Name:</p>
                  <input className='rounded w-100 bg-white' value={fullName} onChange={(e) => setFullName(e.target.value)}/>
                  <p className='mt-5 text-lg'>Nick Name:</p>
@@ -75,7 +75,7 @@ catch(e){
               </form>
             </div>
             <div>
-            <form className='rounded w-110 py-10 bg-gray-200'>
+            <form className='rounded w-110 p-10 bg-gray-200'>
                 <p className='text-left text-xl'>Upload Profile Picture</p>
                 <input type='file' accept='image/*' onChange={handleFileChange} />
               </form>
@@ -97,7 +97,7 @@ catch(e){
             </div>
             
             </div>
-            <div className='right-30 bottom-20 absolute'>
+            <div className='right-20 bottom-10 absolute'>
               <button className='bg-black text-white py-1 px-5 mr-5 rounded hover:cursor-pointer' onClick={() => handleSave()}>Save</button>
               <button className='bg-black text-white py-1 px-5 rounded hover:cursor-pointer'>Cancel</button>
             </div>
