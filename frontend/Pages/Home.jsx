@@ -13,17 +13,17 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-     let currentStream = null;
+    
      const fetchStream = async () => {
       try{
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: true
         });
-        currentStream = stream;
+        setMyStream(stream);
 
         if(videoRef.current)
-          videoRef.current.srcObject = currentStream
+          videoRef.current.srcObject = stream;
       }
       catch(e){
 console.error("Error accessing media devices:", e);
@@ -32,10 +32,7 @@ console.error("Error accessing media devices:", e);
 
      fetchStream();
 
-     return () => {
-      if(currentStream)
-        currentStream.getTracks().forEach(track => track.stop());
-     };
+     
   },[]);
 
   const handleJoinRoom = () => {
@@ -53,6 +50,26 @@ console.error("Error accessing media devices:", e);
         socket.off('Joined-room', handleJoinedRoom)
       }
   },[])
+
+const handleCamera = useCallback(() => {
+
+  if(myStream){
+    const videoTrack = myStream.getVideoTracks()[0];
+    if(videoTrack){
+      videoTrack.enabled = !videoTrack.enabled;
+    }
+  }
+},[myStream])
+
+const handleMicrophone = useCallback(() => {
+    if(myStream){
+      const audioTrack = myStream.getAudioTracks()[0];
+      if(audioTrack){
+        audioTrack.enabled = !audioTrack.enabled
+      }
+    }
+},[myStream])
+
   return (
     
     <div>
@@ -63,15 +80,15 @@ autoPlay
 playsInline
 muted
 ref={videoRef}
-className='w-100 h-100 border-1 mt-30 rounded shadow-xl'
+className='w-100 h-80 mt-40 rounded shadow-xl'
       />
       <div className='mt-30 ml-50 shadow-2xl h-100 p-10 rounded'>
       <p className='font-bold text-3xl my-5'>Join Meeting</p>
       <input type='email' value={email} onChange={e=> setEmail(e.target.value)} placeholder='Enter Email' className='border-1 p-2 px-5 rounded w-100'></input><br /><br/>
       <input type='text' value={roomId} onChange={e=> setRoomId(e.target.value)} placeholder='Enter Room Id' className='border-1 p-2 px-5  rounded w-100'></input><br /><br/>
       <button type='button' className='px-15 py-3 bg-black text-white rounded hover:cursor-pointer hover:border-1' onClick={handleJoinRoom}>Join Room</button>
-      <p className='text-left font-bold text-gray-600 my-5'>Turn Off Microphone</p>
-      <p className='text-left font-bold text-gray-600'>Turn Off Camera</p>
+      <p className='text-left font-bold text-gray-600 my-5'>Turn Off Microphone<input type='checkbox' onClick={handleMicrophone} className='absolute right-30 h-4 w-4'></input> </p>
+      <p className='text-left font-bold text-gray-600'>Turn Off Camera<input type='checkbox' onClick={handleCamera} className='absolute right-30 h-4 w-4'></input></p>
       </div>
       </div>
     </div>
