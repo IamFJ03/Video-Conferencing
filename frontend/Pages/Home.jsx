@@ -2,13 +2,15 @@ import React,{useCallback, useEffect, useRef, useState} from 'react';
 import Sidebar from '../components/sidebar';
 import { useSocket } from '../Provider/Socket';
 import { useUserContext } from '../Provider/UserContext';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import { Video, Mic, VideoOff, MicOff } from 'lucide-react';
 
 export default function Home() {
   const { user } = useUserContext();
-  const [email, setEmail] = useState("");
-  const [roomId, setRoomId] = useState("");
+  const location = useLocation();
+  const {code} = location.state || {};
+  const [email, setEmail] = useState(user.email || "");
+  const [roomId, setRoomId] = useState(code || "");
   const [microphone, setMicrophone] = useState(true);
   const [vid, setVid] = useState(true);
   const [myStream, setMyStream] = useState(null);
@@ -16,9 +18,9 @@ export default function Home() {
 
   const {socket} = useSocket();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    
+     console.log(code);
      const fetchStream = async () => {
       try{
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -110,7 +112,16 @@ className='w-100 h-80 mt-30 rounded shadow-xl'
       <div className='mt-30 ml-50 shadow-2xl h-100 p-10 rounded'>
       <p className='font-bold text-3xl my-5'>Join Meeting</p>
       <input type='email' value={user.email ? user.email : 'Login Required...'}  className='border-1 p-2 px-5 rounded w-100 text-gray-500' disabled ></input><br /><br/>
-      <input type='text' value={roomId} onChange={e=> setRoomId(e.target.value)} placeholder='Enter Room Id' className='border-1 p-2 px-5  rounded w-100'></input><br /><br/>
+      {
+        code ?
+        <div>
+        <input type='text' value={roomId} className='border-1 p-2 px-5 text-gray-500 rounded w-100' disabled></input><br /><br/>
+        </div>
+        :
+        <div>
+        <input type='text' value={roomId} onChange={e=> setRoomId(e.target.value)} placeholder='Enter Room Id' className='border-1 p-2 px-5  rounded w-100'></input><br /><br/>
+        </div>
+      }
       <button type='button' className='px-15 py-3 bg-black text-white rounded hover:cursor-pointer hover:border-1' onClick={handleJoinRoom}>Join Room</button>
       <p className='text-left font-bold text-gray-600 my-5'>Turn On Microphone<input type='checkbox' checked={microphone} onClick={handleMicrophone} className='absolute right-50 h-4 w-4'></input> </p>
       <p className='text-left font-bold text-gray-600'>Turn On Camera<input type='checkbox' checked={vid} onClick={handleCamera} className='absolute right-50 h-4 w-4'></input></p>

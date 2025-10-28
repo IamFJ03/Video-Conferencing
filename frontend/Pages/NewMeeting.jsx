@@ -66,6 +66,20 @@ export default function NewMeeting() {
     setDescription("");
   }
 
+  const generateRoomCode = (length) => {
+    const ch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for(let i=0;i<length;i++){
+      code+=ch.charAt(Math.floor(Math.random() * ch.length));
+    }
+    return code;
+  }
+
+  const handleGenerateCode = () => {
+  const Otp = generateRoomCode(10);
+  setLink(Otp);
+};
+
   return (
     <div>
       <div className='flex'>
@@ -76,7 +90,7 @@ export default function NewMeeting() {
             <div className='flex justify-between items-center'><span className='font-bold'>Meeting Title</span><input type='text' placeholder='E.g. Doubt Session' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={title} onChange={(e) => setTitle(e.target.value)} /></div>
             <div className='flex justify-between items-center my-10'><span className='font-bold text-left'>Date</span><input type='date' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={date} onChange={(e) => setDate(e.target.value)} /></div>
             <div className='flex justify-between items-center'><span className='font-bold text-left'>Time</span><input type='time' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={time} onChange={(e) => setTime(e.target.value)} /></div>
-            <div className='flex justify-between items-center my-10'><span className='font-bold text-left'>Location/Link</span><input type='text' placeholder='Create room Link' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={link} onChange={(e) => setLink(e.target.value)} /></div>
+            <div className='flex justify-between items-center my-10'><span className='font-bold text-left'>Room Code:</span><input type='text' placeholder='Create room Link' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={link} disabled /></div><button className='bg-gray-500 py-1 px-3 rounded relative bottom-5 left-42 cursor-pointer text-white' onClick={() => handleGenerateCode()}>Generate</button>
             <div className='flex justify-between items-center'><span className='font-bold text-left'>Description</span><textarea placeholder='Add Agenda or notes' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={description} onChange={(e) => setDescription(e.target.value)} /></div>
             <p className='text-left my-5 text-red-600'>{errorMsg}</p>
             <div className='flex justify-between'>

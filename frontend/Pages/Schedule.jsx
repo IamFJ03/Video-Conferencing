@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/sidebar';
 import { Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useUserContext } from '../Provider/UserContext';
 import axios from 'axios';
 export default function Schedule() {
+
   const { user } = useUserContext();
   const [data, setData] = useState([]);
 
@@ -53,7 +54,12 @@ export default function Schedule() {
                         <p>{item.date}</p>
                         <p>{item.time}</p>
                         <p>{item.title}</p>
-                        <p>{item.link}</p>
+                        <p><Link
+                          to="/join-meeting"
+                          state={{ code: item.link }}
+                        >
+                          Join
+                        </Link></p>
                       </div>
                     </div>
                   ))}
@@ -62,7 +68,7 @@ export default function Schedule() {
                 <div>
                   <p className='text-gray-500 text-xl font-mono'>No Meetings Scheduled yet...</p>
                 </div>
-                }
+              }
             </div>
             <div>
 
@@ -70,6 +76,6 @@ export default function Schedule() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
