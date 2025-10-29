@@ -90,7 +90,7 @@ export default function NewMeeting() {
     <div className='relative'>
       <div className='flex'>
         <Sidebar />
-        <div className='h-150 p-15 rounded shadow-2xl ml-50 mt-5'>
+        <div className='h-160 p-15 rounded shadow-2xl ml-50 mt-5'>
           <p className='font-bold text-3xl mb-10'>New Meeting</p>
           <div>
             <div className='flex justify-between items-center'><span className='font-bold'>Meeting Title</span><input type='text' placeholder='E.g. Doubt Session' className='border-1 w-80 py-1 px-2 ml-2 rounded' value={title} onChange={(e) => setTitle(e.target.value)} /></div>
