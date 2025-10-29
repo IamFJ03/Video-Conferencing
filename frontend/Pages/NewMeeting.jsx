@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Sidebar from '../components/sidebar';
-import { X } from 'lucide-react';
+import { X, CheckCircle } from 'lucide-react';
 import { useUserContext } from '../Provider/UserContext';
 import axios from "axios";
 
@@ -13,6 +13,7 @@ export default function NewMeeting() {
   const [errorMsg, setErrorMsg] = useState("")
   const [modal, setModal] = useState(false);
   const { user } = useUserContext();
+  const [successAlert, setSuccessAlert] = useState(false)
 
   const handleSave = async () => {
     console.log("Title:", title, "date:", date, "Time:", time, "Link:", link, "Description:", description);
@@ -54,6 +55,7 @@ export default function NewMeeting() {
     setTime("");
     setLink("");
     setDescription("");
+    
   }
 
 
@@ -64,6 +66,10 @@ export default function NewMeeting() {
     setTime("");
     setLink("");
     setDescription("");
+    setSuccessAlert(true);
+    setTimeout(() => {
+    setSuccessAlert(false);
+    }, 3000)
   }
 
   const generateRoomCode = (length) => {
@@ -81,7 +87,7 @@ export default function NewMeeting() {
 };
 
   return (
-    <div>
+    <div className='relative'>
       <div className='flex'>
         <Sidebar />
         <div className='h-150 p-15 rounded shadow-2xl ml-50 mt-5'>
@@ -130,6 +136,13 @@ export default function NewMeeting() {
           </div>
         </div>
       }
+      <div className={`absolute bottom-15 right-0 py-2 px-5 bg-white shadow-xl rounded-2xl transition-opacity duration-500 ease-in-out ${successAlert ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className='flex items-center gap-3'>
+        <CheckCircle size={25} color='black' />
+        <p className='font-bold text-xl'>Success</p>
+        </div>
+        <p>Meeting Scheduled Successfully.</p>
+      </div>
     </div>
   )
 }

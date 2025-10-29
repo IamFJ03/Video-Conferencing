@@ -1,3 +1,4 @@
+import e from "express";
 import { meetInfo } from "../model/meet.model.js";
 
 const meetInfoSave = async (req, res) => {
@@ -36,4 +37,21 @@ const fetchMeetInfo = async (req, res) => {
     }
 } 
 
-export { meetInfoSave, fetchMeetInfo };
+const removeSchedule = async (req, res) => {
+    try{
+        const itemID = req.params.id;
+        console.log("Scheduled meeting ID at backend:", itemID);
+        const remove = await meetInfo.deleteOne({_id: itemID});
+        if(remove.deletedCount ===1){
+            console.log(`Successfully deleted document with ID: ${itemID}`);
+            res.json({status:"Schedule removed"})
+        }
+        else
+            console.log(`Document not found with ID: ${itemID}`);       
+    }
+    catch(e){
+        res.status(500).json({error:"Internal Server Error"});
+    }
+}
+
+export { meetInfoSave, fetchMeetInfo, removeSchedule };

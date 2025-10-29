@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/sidebar';
-import { Plus } from 'lucide-react';
+import { Plus,DeleteIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUserContext } from '../Provider/UserContext';
 import axios from 'axios';
@@ -30,7 +30,21 @@ export default function Schedule() {
     }
 
     fetching();
-  }, [])
+  }, []);
+
+  const handleDeleteSchedule = async (itemID) => {
+      console.log("Scheduled Meeting ID:", itemID);
+      try{
+        const res = await axios.delete(`http://localhost:8000/api/meeting/deleteMeeting/${itemID}`);
+        if(res.data.status==="Schedule removed"){
+          console.log(`Successfully deleted meeting with ID: ${itemID}`);
+          setData(prevData => prevData.filter(item => item._id !=itemID))
+        }
+      }
+      catch(e){
+        console.log("Error:", e);
+      }
+  }
   return (
     <div>
       <div className='flex'>
@@ -44,12 +58,13 @@ export default function Schedule() {
                 <div>
                   <div className='flex justify-between px-5 mb-5 font-bold text-xl font-mono'>
                     <p>Date</p>
-                    <p className='ml-10'>Time</p>
-                    <p>Title</p>
+                    <p className='ml-25'>Time</p>
+                    <p className='ml-20'>Title</p>
                     <p>Joining Code</p>
                   </div>
                   {data.map((item, index) => (
-                    <div key={item.id} className='border border-gray-200 py-3 px-4 rounded-lg shadow-xl mb-5'>
+                    <div className='flex items-center'>
+                    <div key={item.id} className='border border-gray-200 py-3 px-4 rounded-lg shadow-xl mb-5 w-230'>
                       <div className='flex justify-between'>
                         <p>{item.date}</p>
                         <p>{item.time}</p>
@@ -61,6 +76,9 @@ export default function Schedule() {
                           Join
                         </Link></p>
                       </div>
+
+                    </div>
+                    <DeleteIcon size={30} color='black' className='absolute right-40'onClick={() => handleDeleteSchedule(item._id)}/>
                     </div>
                   ))}
                 </div>
