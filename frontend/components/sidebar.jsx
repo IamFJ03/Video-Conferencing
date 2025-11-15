@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Home, User, Calendar, Settings, LogOut } from 'lucide-react';
 export default function sidebar() {
   return (
-      <div className='h-screen bg-black w-50 bottom-8 md:right-39 right-8 relative'>
+      <div className='hidden md:block h-screen bg-black w-50 bottom-8 md:right-39 right-8 relative'>
           <p className='text-white text-2xl font-bold py-5 border-b-1 w-50'>MeetConf</p>
           <ul className='text-white text-left py-10 px-10'>
             <li className='flex flex-row items-center'>
