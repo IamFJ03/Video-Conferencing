@@ -82,18 +82,18 @@ export default function Authentication() {
     }
   }
   return (
-    <div className='flex justify-center'>
+    <div className='flex justify-center overflow-hidden w-90 md:w-screen h-fit py-10'>
       {viewType === "login" ?
         (
           <div>
-            <div className=' h-120 rounded-2xl p-15 shadow-2xl mt-20'>
+            <div className=' h-115 rounded-2xl md:p-15 py-10 min-w-70 shadow-xl mt-20 md:mt-0 md:-ml-100'>
               <p className='text-black font-bold text-2xl'>Welcome Back!</p>
               <p className='text-gray-400'>Log In to have video conference</p>
-              <p className='text-left pt-5 mb-2 text-lg'>Email:</p>
-              <input placeholder='Enter Email' type='email' className='border-1 w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
-              <p className='text-left mb-2 pt-5 text-lg'>Password:</p>
-              <input placeholder='Enter Password' type='password' className='border-1 w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
-              <button className='bg-gray-900 text-white my-5 py-2 w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
+              <p className='text-left pt-5 mb-2 text-lg ml-[10%] md:ml-0'>Email:</p>
+              <input placeholder='Enter Email' type='email' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
+              <p className='text-left mb-2 pt-5 text-lg ml-[10%] md:ml-0'>Password:</p>
+              <input placeholder='Enter Password' type='password' className='border-1 w-55 md:w-70 py-1 px-2 rounded mb-5' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
+              <button className='bg-gray-900 text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
               <span>Don't have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("signup")}>Sign Up</span>
             </div>
 
@@ -101,16 +101,16 @@ export default function Authentication() {
         )
         :
         (
-          <div className='w-100 h-140 rounded-2xl p-10 shadow-2xl mt-20'>
+          <div className=' h-140 rounded-2xl p-10 shadow-xl -ml-7 md:-ml-100 mt-20 md:mt-0 min-w-70 '>
             <p className='text-black font-bold text-2xl'>Welcome to MeetConf</p>
-            <p className='text-gray-400'>Sign Up to have video conferencing with close ones, meet ups etc.</p>
-            <p className='text-left ml-5 pt-5 mb-2 text-lg'>UserName:</p>
-            <input placeholder='Enter Username' type='text' className='border-1 w-70 py-1 px-2 rounded' value={username} onChange={(e) => setUsername(e.target.value)} />
-            <p className='text-left ml-5 pt-5 mb-2 text-lg'>Email:</p>
-            <input placeholder='Enter Email' type='email' className='border-1 w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
-            <p className='text-left ml-5 mb-2 pt-5 text-lg'>Password:</p>
-            <input placeholder='Enter Password' type='password' className='border-1 w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
-            <button className='bg-gray-900 text-white my-5 py-2 w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
+            <p className='text-gray-400 w-60'>Sign Up to have video conferencing with close ones, meet ups etc.</p>
+            <p className='text-left md:ml-0 pt-5 mb-2 text-lg ml-[10%]'>UserName:</p>
+            <input placeholder='Enter Username' type='text' className='border-1 w-55   md:w-70 py-1 px-2 rounded' value={username} onChange={(e) => setUsername(e.target.value)} />
+            <p className='text-left md:ml-0 pt-5 mb-2 text-lg ml-[10%]'>Email:</p>
+            <input placeholder='Enter Email' type='email' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
+            <p className='text-left md:ml-0 mb-2 pt-5 text-lg ml-[10%]'>Password:</p>
+            <input placeholder='Enter Password' type='password' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
+            <button className='bg-gray-900 text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
             <span>Already have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("login")}>Log In</span>
           </div>
         )

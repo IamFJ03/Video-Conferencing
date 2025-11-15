@@ -33,11 +33,17 @@ const login = async (req, res) => {
     try {
         let user = await User.findOne({ Email: email });
         if (user) {
-            const USER = {id: user._id, username: user.Username, email: user.Email, password: user.password};
-            const token = jwt.sign(USER, jwtKey, {expiresIn:'24h'}, (err, token) => {
-                res.json({message:"Authentication Succesfull",token, newUser: USER});
+            const USER = { id: user._id, username: user.Username, email: user.Email, password: user.password };
+            const token = jwt.sign(USER, jwtKey, { expiresIn: '24h' }, (err, token) => {
+                res.json({ message: "Authentication Succesfull", token, newUser: USER });
             })
-            const otp = otpGenerator.generate(6, { digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false })
+            const otp = otpGenerator.generate(6, {
+                digits: true,
+                lowerCaseAlphabets: false,
+                upperCaseAlphabets: false,
+                specialChars: false
+            })
+
             const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
             const mailOptions = {
                 from: process.env.EMAIL_USER,
@@ -58,7 +64,7 @@ const login = async (req, res) => {
 
                 console.log("Sending message:", info.response);
             })
-            
+
         }
         else
             res.json({ message: "User doesn't Exists" });
@@ -68,36 +74,36 @@ const login = async (req, res) => {
     }
 }
 
-function Authenticate(req, res, next){
-const authHeader = req.headers['authorization'];
-if(!authHeader) return res.json({message:"Token Missing!!"})
+function Authenticate(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.json({ message: "Token Missing!!" })
     const token = authHeader.split(' ')[1];
-if(!token)
+    if (!token)
         return res.status(401).json({ message: "Token is missing from Authorization header" });
-jwt.verify(token, jwtKey, (err, user) => {
-    if(err)
-        return res.status(505).json({error:"Not Found"});
+    jwt.verify(token, jwtKey, (err, user) => {
+        if (err)
+            return res.status(505).json({ error: "Not Found" });
 
-    req.user = user;
-    req.token = token;
-    next();
-})
+        req.user = user;
+        req.token = token;
+        next();
+    })
 }
 
 const verify = async (req, res) => {
     const { email, otp } = req.body;
-    try{
-    const userVerification = await User.findOne({Email: email, otp});
-    
-    if(userVerification){
-        res.json({message:"User is Identified"});
+    try {
+        const userVerification = await User.findOne({ Email: email, otp });
+
+        if (userVerification) {
+            res.json({ message: "User is Identified" });
+        }
+        else
+            res.json({ message: "User is Suspecious" });
     }
-    else
-        res.json({message:"User is Suspecious"});
-}
-catch(error){
-    res.status(500).json({message:'Error during Verification, Please try again to continue...'});
-}
+    catch (error) {
+        res.status(500).json({ message: 'Error during Verification, Please try again to continue...' });
+    }
 }
 
 export { SignUp, login, verify, Authenticate }
