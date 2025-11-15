@@ -12,7 +12,7 @@ export default function Dashboard() {
           
           <p className='font-mono text-white text-4xl pt-10'>MeetConf</p>
         </div>
-        <div className='flex flex-col md:flex-row md:justify-center md:gap-40 mt-40 md:mt-20 md:ml-20 ml-10 md:flex-wrap gap-10'>
+        <div className='flex flex-col md:flex-row md:justify-center md:gap-40 mt-40 mb-20 md:mb-0 md:mt-20 md:ml-20 ml-10 md:flex-wrap gap-10'>
           <Link to={"/create-meeting"}><div className='h-50 md:min-w-70 w-70 bg-black rounded-2xl flex flex-col items-center justify-center hover:shadow-2xl hover:mt-[-20px] duration-500 hover:cursor-pointer'>
             <Video color='white' size={50} strokeWidth={1.5} />
             <p className='text-white text-3xl'>New Meeting</p>
