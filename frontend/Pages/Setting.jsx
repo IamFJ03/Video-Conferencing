@@ -1,110 +1,103 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/sidebar';
 import axios from 'axios';
+
 export default function Setting() {
-  const [fullName, setFullName] = useState("");
-  const [nickName, setNickName] = useState("");
-  const [gender, setGender] = useState("");
-  const [country, setCountry] = useState("");
-  const [language, setLanguage] = useState("");
-  const [contact, setContact] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [nickName, setNickName] = useState('');
+  const [gender, setGender] = useState('');
+  const [country, setCountry] = useState('');
+  const [language, setLanguage] = useState('');
+  const [contact, setContact] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
 
-  const handleFileChange = (e) => {
-    setProfilePicture(e.target.files[0])
-  }
+  const handleFileChange = (e) => setProfilePicture(e.target.files[0]);
 
   const handleSave = async () => {
-    const token = await localStorage.getItem('token');
-  const formData = new FormData();
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
     formData.append('fullname', fullName);
     formData.append('nickname', nickName);
     formData.append('gender', gender);
     formData.append('country', country);
     formData.append('language', language);
     formData.append('contact', contact);
-    if(profilePicture)
-      formData.append('profilePicture', profilePicture);
-    
-    const data = {};
-formData.forEach((value, key) => {
-  data[key] = value;
-});
-console.log(data);
-try{
-  const response = await axios.post('http://localhost:8000/api/user/saveUser', formData,{
-    headers:{
-      "Authorization": `Bearer ${token}`
-    }
-  });
-  if(response.data.message==="User Updated")
-    console.log("Updated:", response.data.user)
-  else
-    console.log("Created Succesfully", response.data.user);
-}
-catch(e){
+    if (profilePicture) formData.append('profilePicture', profilePicture);
 
-}
-  }
+    try {
+      await axios.post('http://localhost:8000/api/user/saveUser', formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (e) {}
+  };
 
   return (
-    <div>
-      <div className='flex'>
-        <div>
-          <Sidebar />
-        </div>
-        <div>
-          <div className='w-270 h-160 bg-white rounded-3xl shadow-2xl ml-[-50px] relative'>
-            <p className='text-left text-2xl pt-5 ml-20 font-bold'>Accounts Setting</p>
-            <div className='flex items-center justify-between px-20'>
-            <div className=' text-left mt-10'>
-              <p className='text-xl'>Edit Profile</p>
-              <form className=' h-120 px-5 mt-5 rounded bg-gray-200 shadow-2xl'>
-                 <p className='text-lg pt-5'>Full Name:</p>
-                 <input className='rounded w-100 bg-white' value={fullName} onChange={(e) => setFullName(e.target.value)}/>
-                 <p className='mt-5 text-lg'>Nick Name:</p>
-                 <input className='rounded w-100 bg-white' value={nickName} onChange={(e) => setNickName(e.target.value)}/>
-                 <p className='mt-5 text-lg'>Gender:</p>
-                 <input className='rounded w-100 bg-white' value={gender} onChange={(e) => setGender(e.target.value)}/>
-                 <p className='mt-5 text-lg'>Country:</p>
-                 <input className='rounded w-100 bg-white' value={country} onChange={(e) => setCountry(e.target.value)}/>
-                 <p className='mt-5 text-lg'>Language:</p>
-                 <input className='rounded w-100 bg-white' value={language} onChange={(e) => setLanguage(e.target.value)}/>
-                 <p className='mt-5 text-lg'>Contact:</p>
-                 <input className='rounded w-100 bg-white' value={contact} onChange={(e) => setContact(e.target.value)}/>
-              </form>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+
+      <div className="flex-1 px-4 sm:px-6 md:px-10 py-6 pb-24">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+          <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Profile Info */}
+            <div className="bg-gray-100 rounded-xl p-4">
+              <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+              <div className="space-y-3">
+                <Input label="Full Name" value={fullName} setValue={setFullName} />
+                <Input label="Nick Name" value={nickName} setValue={setNickName} />
+                <Input label="Gender" value={gender} setValue={setGender} />
+                <Input label="Country" value={country} setValue={setCountry} />
+                <Input label="Language" value={language} setValue={setLanguage} />
+                <Input label="Contact" value={contact} setValue={setContact} />
+              </div>
             </div>
-            <div>
-            <form className='rounded w-110 p-10 bg-gray-200'>
-                <p className='text-left text-xl'>Upload Profile Picture</p>
-                <input type='file' accept='image/*' onChange={handleFileChange} />
-              </form>
-              <p className='text-xl mb-5 text-left'>Change Password</p>
-              <form className='rounded w-110 py-10 bg-gray-200'>
-                <p className='text-lg text-left px-5'>Current Password:</p>
-                 <input className='rounded w-100 bg-white'/>
-                 <div className='flex px-5'>
-                  <div>
-                 <p className='mt-5 text-lg text-left'>New Password:</p>
-                 <input className='rounded w-47 bg-white'/>
-                 </div>
-                 <div className='ml-5'>
-                 <p className='mt-5 text-lg text-left'>Confirm Password:</p>
-                 <input className='rounded w-47 bg-white'/>
-                 </div>
-                 </div>
-              </form>
-            </div>
-            
-            </div>
-            <div className='right-20 bottom-10 absolute'>
-              <button className='bg-black text-white py-1 px-5 mr-5 rounded hover:cursor-pointer' onClick={() => handleSave()}>Save</button>
-              <button className='bg-black text-white py-1 px-5 rounded hover:cursor-pointer'>Cancel</button>
+
+            {/* Security */}
+            <div className="space-y-6">
+              <div className="bg-gray-100 rounded-xl p-4">
+                <h2 className="text-xl font-semibold mb-4">Profile Picture</h2>
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+                <div className="space-y-3">
+                  <input className="w-full rounded p-2" placeholder="Current Password" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input className="rounded p-2" placeholder="New Password" />
+                    <input className="rounded p-2" placeholder="Confirm Password" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Actions */}
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              onClick={handleSave}
+              className="bg-black text-white px-6 py-2 rounded"
+            >
+              Save
+            </button>
+            <button className="bg-gray-300 px-6 py-2 rounded">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+function Input({ label, value, setValue }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="w-full rounded p-2"
+      />
+    </div>
+  );
 }
