@@ -11,17 +11,17 @@ export default function Authentication() {
   const [username, setUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
-  const {user, setUser} = useUserContext();
+  const { user, setUser } = useUserContext();
   const navigate = useNavigate();
   const handleSignUp = async () => {
     try {
       if (username === "" || logEmail === "" || logPass === "") {
-  setErrorMsg("Fill all details");
-  setShowError(true);
-  setTimeout(() => {
-    setShowError(false);
-  }, 3000);
-  return;
+        setErrorMsg("Fill all details");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+        return;
       };
       const response = await axios.post("http://localhost:8000/api/authentication/Signup", {
         username: username,
@@ -38,8 +38,8 @@ export default function Authentication() {
         console.log(response.data.message);
         setErrorMsg("User Already Exists");
         setShowError(true);
-        setTimeout(()=>{
-            setShowError(false)
+        setTimeout(() => {
+          setShowError(false)
         }, 3000);
       }
     }
@@ -49,12 +49,12 @@ export default function Authentication() {
   }
   const handleLogin = async () => {
     if (logEmail === "" || logPass === "") {
-  setErrorMsg("Fill all details");
-  setShowError(true);
-  setTimeout(() => {
-    setShowError(false);
-  }, 3000);
-}
+      setErrorMsg("Fill all details");
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+    }
     const response = await axios.post("http://localhost:8000/api/authentication/login", {
       email: logEmail,
       password: logPass
@@ -76,9 +76,9 @@ export default function Authentication() {
       setLogPass("");
       setErrorMsg("Login Credentials wrong either mail or password");
       setShowError(true);
-      setTimeout(()=>{
-            setShowError(false)
-        }, 3000)
+      setTimeout(() => {
+        setShowError(false)
+      }, 3000)
     }
   }
   return (

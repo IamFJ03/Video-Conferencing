@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Home, User, Calendar, Settings, LogOut } from 'lucide-react';
+
 export default function sidebar() {
   return (
     <div>
@@ -30,12 +31,20 @@ export default function sidebar() {
           <span className=''>LogOut</span>
         </p>
       </div>
-      <div className='md:hidden bg-black h-20 fixed inset-0 top-216 w-full left-0 z-10 flex justify-between px-10 pt-4'>
-         <Link to={'/home'}><Home color='white' size={40} className='' strokeWidth={1.5}/></Link>
-         <Link to={'/schedule'}><Calendar color='white' size={40} strokeWidth={1.5}/></Link>
-         <Link to={'/setting'}><Settings color='white' size={40} strokeWidth={1.5}/></Link>
-         <Link to={'/profile'}><User color='white' size={40} strokeWidth={1.5}/></Link>
-      </div>
+      <div className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-black z-50 flex justify-around items-center">
+  <Link to="/home">
+    <Home color="white" size={28} strokeWidth={1.5} />
+  </Link>
+  <Link to="/schedule">
+    <Calendar color="white" size={28} strokeWidth={1.5} />
+  </Link>
+  <Link to="/setting">
+    <Settings color="white" size={28} strokeWidth={1.5} />
+  </Link>
+  <Link to="/profile">
+    <User color="white" size={28} strokeWidth={1.5} />
+  </Link>
+</div>
     </div>
   )
 }

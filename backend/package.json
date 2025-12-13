@@ -11,5 +11,17 @@
     "otp-generator": "^4.0.1",
     "socket.io": "^4.8.1"
   },
-  "type": "module"
+  "type": "module",
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "connection.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
