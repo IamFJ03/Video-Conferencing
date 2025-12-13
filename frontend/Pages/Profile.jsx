@@ -1,114 +1,100 @@
-import React, { useEffect, useState } from 'react'
-import Sidebar from '../components/sidebar'
-import { useUserContext } from '../Provider/UserContext'
+import React, { useEffect, useState } from 'react';
+import Sidebar from '../components/sidebar';
+import { useUserContext } from '../Provider/UserContext';
 import { UserCircle2Icon, MailIcon } from 'lucide-react';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Profile() {
   const [userData, setUserData] = useState({});
   const { user } = useUserContext();
-  const [fullName, setFullName] = useState("");
+
   useEffect(() => {
-    const fetchedUser = () => {
-      console.log("User:", user);
-    }
-
     const fetchData = async () => {
-      const token = await localStorage.getItem("token");
-      const response = await axios.post('http://localhost:8000/api/user/fetchData',{},{
-        headers:{
-          "Authorization": `Bearer ${token}`
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+          'http://localhost:8000/api/user/fetchData',
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.message === 'User Data Fetched') {
+          setUserData(response.data.user);
         }
-      });
-    
-      if(response.data.message==="User Data Fetched"){
-        console.log("User Data:", response.data.user);
-        setUserData(response.data.user);
-      }
-      else
-        console.log("User Data not found");
-    }
+      } catch (e) {}
+    };
 
-    fetchedUser();
     fetchData();
-  }, [])
+  }, []);
+
   return (
-    <div className='flex bg-gray-50 w-342 bottom-8 relative'>
-      <div className='top-8 relative'>
-        <Sidebar />
-      </div>
-      <div>
-        <div className='w-270 h-170 bg-white mt-10 rounded-3xl shadow-2xl ml-[-50px]'>
-          <div className='flex items-center justify-between px-20 mb-10'>
-            <div className='flex items-center py-5'>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+
+      <div className="flex-1 px-4 sm:px-6 md:px-10 py-6 pb-24">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              {userData.profilePicture ? (
+                <img
+                  src={`http://localhost:8000/profile-picture/${userData.profilePicture}`}
+                  className="h-16 w-16 rounded-full object-cover"
+                />
+              ) : (
+                <UserCircle2Icon size={56} />
+              )}
               <div>
-                {userData.profilePicture ? 
-                <>
-              <img src={`http://localhost:8000/profile-picture/${userData.profilePicture}`} className='h-25 w-25 rounded-full' />
-              </>
-              :
-              <UserCircle2Icon color='black' size={45} strokeWidth={1.5} />  
-              }
-              </div>
-              <div className='ml-2'>
-                <p className='font-bold text-lg text-left'>{user.username}</p>
-                <p className='text-md text-gray-400 text-left'>{user.email}</p>
+                <p className="font-bold text-lg">{user.username}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
               </div>
             </div>
-            <div>
-              <button className='bg-black text-white py-2 px-5 rounded hover:cursor-pointer'><Link to="/setting">Edit</Link></button>
-            </div>
+
+            <Link
+              to="/setting"
+              className="bg-black text-white px-5 py-2 rounded text-center"
+            >
+              Edit Profile
+            </Link>
           </div>
 
+          {/* Info Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <Info label="Full Name" value={userData.fullName} />
+            <Info label="Nick Name" value={userData.nickName} />
+            <Info label="Gender" value={userData.gender} />
+            <Info label="Country" value={userData.country} />
+            <Info label="Language" value={userData.language} />
+            <Info label="Contact No" value={userData.contact} />
+          </div>
 
-
+          {/* Email Section */}
           <div>
-            <div className='flex justify-between px-20 mb-10'>
-              <div>
-              <p className='text-left mb-2 font-bold'>Full Name:</p>
-              <input value={userData.fullName ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
-              <div>
-              <p className='text-left mb-2 font-bold'>Nick Name:</p>
-              <input value={userData.nickName ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
+            <p className="text-xl font-bold mb-4">My Email Address</p>
+            <div className="flex items-center gap-3 mb-4">
+              <MailIcon size={28} />
+              <p>{user.email}</p>
             </div>
-            <div className='flex justify-between px-20 mb-10'>
-              <div>
-              <p className='text-left mb-2 font-bold'>Gender:</p>
-              <input value={userData.gender ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
-              <div>
-              <p className='text-left mb-2 font-bold'>Country:</p>
-              <input value={userData.country ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
-            </div>
-            <div className='flex justify-between px-20 mb-10'>
-              <div>
-              <p className='text-left mb-2 font-bold'>Language:</p>
-              <input value={userData.language ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
-              <div>
-              <p className='text-left mb-2 font-bold'>Contact No:</p>
-              <input value={userData.contact ?? "nill"} disabled className='bg-gray-200 rounded px-5 py-2 w-100 text-gray-500' />
-              </div>
-            </div>
+            <button className="bg-black text-white px-5 py-2 rounded">
+              Update Email
+            </button>
           </div>
-          <div className='px-20'>
-            <p className='text-xl font-bold text-left mb-5'>My Email Address:</p>
-            <div className='flex items-center gap-3'>
-            <MailIcon color='black' size={30} strokeWidth={1.5}/>
-            <p>{user.email}</p>
-            </div>
-            <div className='flex mt-5'>
-            <button className='bg-black text-white font-bold py-2 px-5 rounded hover:cursor-pointer'>Update Email</button>
-            </div>
-          </div>
-
-
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+function Info({ label, value }) {
+  return (
+    <div>
+      <label className="block font-semibold mb-1">{label}</label>
+      <input
+        disabled
+        value={value ?? 'N/A'}
+        className="w-full bg-gray-200 rounded px-4 py-2 text-gray-600"
+      />
+    </div>
+  );
 }
