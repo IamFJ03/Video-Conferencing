@@ -25,7 +25,6 @@ export default function Room() {
         socket.emit("call-user", { email, offer });
     }, [Peer, socket]);
 
-
     const getUserMediaStream = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: true,
@@ -93,8 +92,6 @@ export default function Room() {
     }, [Peer]);
 
     useEffect(() => {
-        console.log("Attaching socket listeners", socket.id);
-
         socket.on("user-joined", handleNewUserJoined);
         socket.on("incoming-call", handleIncomingCall);
         socket.on("call-accepted", handleCallAccepted);

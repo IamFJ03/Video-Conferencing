@@ -1,55 +1,47 @@
-import React,{useMemo, createContext, useEffect, useState, useCallback, useRef} from 'react'
+import React,{useMemo, createContext, useEffect, useState, useContext, useRef} from 'react'
 
 const GlobalContext = createContext(null)
 
 export const usePeer = () => {
-  return React.useContext(GlobalContext)
+  return useContext(GlobalContext)
 }
 
 export default function PeerProvider({children}) {
-  const [remoteStream, setRemoteStream] = useState(null)
-  const remoteMediaStream = useRef(new MediaStream());
-  
-  const Peer = useMemo(
-    () => 
-        new RTCPeerConnection({
-        iceServers: [
-            {
-                urls: [
-                    "stun:stun.l.google.com:19302",
-                    "stun:global.stun.twilio.com:3478"
-                ]
-            }
-        ]
-  }),[])
+  const peerRef = useRef({});
 
-  const createOffer = async () => {
-    const offer = await Peer.createOffer();
-    await Peer.setLocalDescription(offer);
-    return offer;
-  }
+  const createPeer = (email, socket, stream, onTrack) => {
+    if(peerRef.current[email]) return peerRef.current[email];
 
-  const createAnswer = async (offer) => {
-    await Peer.setRemoteDescription(new RTCSessionDescription(offer))
-    const answer = await Peer.createAnswer();
-    await Peer.setLocalDescription(answer)
-    return answer
-  }
+    const Peer = new RTCPeerConnection({
+      iceServers:[
+        {urls:"stun:stun.l.google.com:19302" },
+        {urls:"stun:global.stun.twilio.com:3478"}
+      ]
+    });
 
-  const setRemoteAnswer = async(ans) => {
-    await Peer.setRemoteDescription(new RTCSessionDescription(ans));
-  }
+    stream.getTracks().forEach(
+      track => {
+        Peer.addTrack(stream, track);
+      } 
+    );
 
-  function sendStream(stream) {
-  stream.getTracks().forEach(track => {
-    const alreadyAdded = Peer.getSenders().find(sender => sender.track === track);
-    if (!alreadyAdded) {
-      Peer.addTrack(track, stream);
-    }
-  });
-}
+    Peer.onTrack = (ev) => {
+      onTrack(email, ev.streams[0])
+    };
 
-  return <GlobalContext.Provider value={{Peer, createOffer, createAnswer, setRemoteAnswer, sendStream, remoteStream, setRemoteStream}}>
+    Peer.onnegotiationneeded = async () => {
+        const offer = await Peer.createOffer();
+        await Peer.setLocalDescription(offer);
+        socket.emit("call-user", {email, offer});
+    };
+
+    peerRef.current[email] = Peer;
+    return Peer;
+  };
+
+  const getPeer = (email) => peerRef.current[email]
+
+  return <GlobalContext.Provider value={{createPeer, getPeer, peerRef}}>
     {children}
   </GlobalContext.Provider>
 }
