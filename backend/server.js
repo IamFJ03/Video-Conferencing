@@ -1,67 +1,115 @@
 import express from "express";
-import {connectDB} from "./connection.js";
+import { connectDB } from "./connection.js";
 import { Server } from "socket.io";
 import auth from "./routes/auth.routes.js";
-import person from './routes/user.routes.js';
-import meet from './routes/meet.routes.js';
+import person from "./routes/user.routes.js";
+import meet from "./routes/meet.routes.js";
 import bodyParser from "body-parser";
 import path from "path";
 import cors from "cors";
+
+const app = express();
 const io = new Server({
-   cors: true
-})
-const app = express()
-app.use(cors())
+  cors: {
+    origin: "*",
+  },
+});
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-const emailToSocketMapping = new Map()
-const socketToEmailMapping = new Map()
-app.use(bodyParser.json())
+const emailToSocket = new Map();    
+const socketToEmail = new Map();     
+const roomUsers = new Map();         
+
 io.on("connection", (socket) => {
-   socket.on("join-room", (data) => {
-      const { email, roomId } = data;
-      console.log("User", email, "Joined ", roomId)
-      emailToSocketMapping.set(email, socket.id)
-      console.log("socket Id", socket.id)
-      socketToEmailMapping.set(socket.id, email)
-      console.log("Email:", email)
-      socket.join(roomId)
-      socket.emit("Joined-room", { email, roomId })
-      socket.broadcast.to(roomId).emit("user-joined", { email })
-   })
+  console.log("New socket connected:", socket.id);
 
-   socket.on("call-user", (data) => {
-      const { email, offer } = data
-      const fromEmail = socketToEmailMapping.get(socket.id)
-      const socketId = emailToSocketMapping.get(email)
-      console.log("call-user received from:", fromEmail, "to:", email, "socketId:", socketId, "offer:", offer);
-      if (socketId) {
-         console.log("Emitting incoming-call to:", socketId);
-         console.log("Is target socket alive?", io.sockets.sockets.has(socketId));
+  socket.on("join-room", ({ email, roomId }) => {
+    console.log(`${email} joined room ${roomId}`);
 
-         socket.to(socketId).emit("incoming-call", { from: fromEmail, offer });
-         console.log("Emit executed");
-      } else {
-         console.log("No socket ID found for", email);
+    emailToSocket.set(email, socket.id);
+    socketToEmail.set(socket.id, email);
+
+    if (!roomUsers.has(roomId)) {
+      roomUsers.set(roomId, new Set());
+    }
+
+    const existingUsers = Array.from(roomUsers.get(roomId));
+    roomUsers.get(roomId).add(email);
+
+    socket.join(roomId);
+
+    socket.emit("room-users", existingUsers);
+
+    socket.broadcast.to(roomId).emit("user-joined", { email });
+  });
+
+  socket.on("call-user", ({ email, offer }) => {
+    const fromEmail = socketToEmail.get(socket.id);
+    const targetSocket = emailToSocket.get(email);
+
+    if (!targetSocket) return;
+
+    socket.to(targetSocket).emit("incoming-call", {
+      from: fromEmail,
+      offer,
+    });
+  });
+
+  socket.on("call-accepted", ({ email, ans }) => {
+    const targetSocket = emailToSocket.get(email);
+    if (!targetSocket) return;
+
+    socket.to(targetSocket).emit("call-accepted", { ans });
+  });
+
+  socket.on("ice-candidate", ({ email, candidate }) => {
+    const targetSocket = emailToSocket.get(email);
+    if (!targetSocket) return;
+
+    socket.to(targetSocket).emit("ice-candidate", {
+      from: socketToEmail.get(socket.id),
+      candidate,
+    });
+  });
+
+  socket.on("disconnect", () => {
+    const email = socketToEmail.get(socket.id);
+    if (!email) return;
+
+    console.log(`${email} disconnected`);
+
+    emailToSocket.delete(email);
+    socketToEmail.delete(socket.id);
+
+    for (const [roomId, users] of roomUsers.entries()) {
+      if (users.has(email)) {
+        users.delete(email);
+        socket.broadcast.to(roomId).emit("user-left", { email });
+
+        if (users.size === 0) {
+          roomUsers.delete(roomId);
+        }
       }
-
-   })
-
-   socket.on("call-accepted", (data) => {
-      const { email, ans } = data
-      const socketId = emailToSocketMapping.get(email);
-      socket.to(socketId).emit("call-accepted", { ans })
-   })
-})
+    }
+  });
+});
 
 app.use("/api/authentication", auth);
 app.use("/api/user", person);
-app.use('/profile-picture', express.static(path.join(process.cwd(), 'profile-picture')));
-app.use('/api/meeting', meet);
+app.use("/api/meeting", meet);
+app.use(
+  "/profile-picture",
+  express.static(path.join(process.cwd(), "profile-picture"))
+);
 
 app.listen(8000, () => {
-   connectDB()
-   console.log("Server started at port 8000")
-})
-io.listen(8001)
+  connectDB();
+  console.log("HTTP server running on 8000");
+});
+
+io.listen(8001);
+console.log("Socket server running on 8001");
