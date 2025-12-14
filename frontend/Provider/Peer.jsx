@@ -21,13 +21,20 @@ export default function PeerProvider({children}) {
 
     stream.getTracks().forEach(
       track => {
-        Peer.addTrack(stream, track);
+        Peer.addTrack(track, stream);
       } 
     );
 
-    Peer.onTrack = (ev) => {
+    Peer.ontrack = (ev) => {
       onTrack(email, ev.streams[0])
     };
+
+    Peer.onicecandidate = (e) => {
+  if (e.candidate) {
+    console.log("ICE →", email);
+    socket.emit("ice-candidate", { to: email, candidate: e.candidate });
+  }
+};
 
     Peer.onnegotiationneeded = async () => {
         const offer = await Peer.createOffer();

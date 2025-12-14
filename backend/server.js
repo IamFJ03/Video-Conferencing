@@ -45,6 +45,7 @@ io.on("connection", (socket) => {
     socket.emit("room-users", existingUsers);
 
     socket.broadcast.to(roomId).emit("user-joined", { email });
+    socket.emit("joined-room", {roomId})
   });
 
   socket.on("call-user", ({ email, offer }) => {
@@ -52,7 +53,8 @@ io.on("connection", (socket) => {
     const targetSocket = emailToSocket.get(email);
 
     if (!targetSocket) return;
-
+    
+    console.log("call-user backend", targetSocket);
     socket.to(targetSocket).emit("incoming-call", {
       from: fromEmail,
       offer,
@@ -62,7 +64,8 @@ io.on("connection", (socket) => {
   socket.on("call-accepted", ({ email, ans }) => {
     const targetSocket = emailToSocket.get(email);
     if (!targetSocket) return;
-
+    
+    console.log("call-accepted backend")
     socket.to(targetSocket).emit("call-accepted", { ans });
   });
 
