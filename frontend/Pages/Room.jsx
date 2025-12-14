@@ -4,50 +4,39 @@ import { usePeer } from "../Provider/Peer";
 
 export default function Room() {
     const [myStream, setMyStream] = useState(null);
-    const [remoteEmail, setRemoteEmail] = useState(null);
-    const [remoteStream, setRemoteStream] = useState(null);
-    
-    const localVideoRef = useRef(null);
-    const remoteVideoRef = useRef(null);
+    const [remoteStreams, setRemoteStreams] = useState({});
 
+    const localVideoRef = useRef(null);
     const { socket } = useSocket();
     const { Peer } = usePeer();
 
-    const sendOffer = useCallback(async (email) => {
-        if (!email) {
-            console.error("Cannot send offer: Remote email is missing.");
-            return;
-        }
-
-        console.log(`Manually creating and sending Offer to ${email}`);
-        const offer = await Peer.createOffer();
-        await Peer.setLocalDescription(offer);
-        socket.emit("call-user", { email, offer });
-    }, [Peer, socket]);
-
-    const getUserMediaStream = useCallback(async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({
+    const getUserMediaStream = async () => {
+        const stream = navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: true,
+            video: true
         });
         setMyStream(stream);
+    }
 
-        stream.getTracks().forEach((track) => Peer.addTrack(track, stream));
-    }, [Peer]);
+    const handleTrack = useCallback((email, stream) => {
+        setRemoteStreams(prev => ({
+            ...prev,
+            [email]: stream
+        }));
+    }, []);
 
     const handleNewUserJoined = useCallback(
         async ({ email }) => {
             console.log("New User ", email, " joined. Starting call process.");
-            setRemoteEmail(email);
-            sendOffer(email);
+            createPeer(email, socket, myStream, handleTrack);
         },
-        [sendOffer]
+        [createPeer, socket, myStream, handleTrack]
     );
 
     const handleIncomingCall = useCallback(
         async ({ from, offer }) => {
             console.log("Incoming Call from:", from);
-            setRemoteEmail(from);
+            createPeer(email, socket, myStream, handleTrack);
 
             await Peer.setRemoteDescription(new RTCSessionDescription(offer));
 
@@ -56,40 +45,19 @@ export default function Room() {
 
             socket.emit("call-accepted", { email: from, ans: answer });
         },
-        [Peer, socket]
+        [createPeer, socket, myStream, handleTrack]
     );
 
     const handleCallAccepted = useCallback(
-        async ({ ans }) => {
+        async ({ ans, from }) => {
             console.log("Call got accepted");
+            const peer = getPeer(from);
+            if (!peer) return;
+
             await Peer.setRemoteDescription(new RTCSessionDescription(ans));
         },
-        [Peer]
+        [getPeer]
     );
-
-    useEffect(() => {
-        const handleNegotiation = async () => {
-            console.warn("negotiationneeded for RENEGOTIATION.");
-           
-            if (remoteEmail) {
-                await sendOffer(remoteEmail);
-            } else {
-                console.error("Renegotiation needed, but remoteEmail is missing.");
-            }
-        };
-
-        Peer.addEventListener("negotiationneeded", handleNegotiation);
-        return () => {
-            Peer.removeEventListener("negotiationneeded", handleNegotiation);
-        };
-    }, [Peer, remoteEmail, sendOffer]); 
-
-    useEffect(() => {
-        Peer.ontrack = (ev) => {
-            console.log("Remote track received:", ev.streams[0]);
-            setRemoteStream(ev.streams[0]);
-        };
-    }, [Peer]);
 
     useEffect(() => {
         socket.on("user-joined", handleNewUserJoined);
@@ -113,21 +81,9 @@ export default function Room() {
         }
     }, [myStream]);
 
-    useEffect(() => {
-        if (remoteVideoRef.current && remoteStream) {
-            console.log("Binding remoteStream to video element", remoteStream);
-            remoteVideoRef.current.srcObject = remoteStream;
-            remoteVideoRef.current
-                .play()
-                .catch((err) => console.error("Remote video play error:", err));
-        }
-    }, [remoteStream]);
-
-
     return (
         <div>
-            <p>This is Room Page.</p>
-            <h4>You are connected to {remoteEmail}</h4>
+            <h3>Group Video Room</h3>
 
             <video
                 autoPlay
@@ -137,12 +93,17 @@ export default function Room() {
                 style={{ width: "400px", border: "1px solid black" }}
             />
 
-            <video
-                autoPlay
-                playsInline
-                ref={remoteVideoRef}
-                style={{ width: "400px", border: "1px solid black" }}
-            />
+            <div className="flex flex-wrap gap-10">
+                {Object.entries(remoteStreams).map(([email, stream]) => (
+                    <video
+                        key={email}
+                        autoPlay
+                        playsInline
+                        ref={(el) => el && (el.srcObject = stream)}
+                        style={{ width: 300, border: "1px solid red" }}
+                    />
+                ))}
+            </div>
         </div>
     );
 }
