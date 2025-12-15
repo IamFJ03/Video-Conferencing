@@ -26,6 +26,8 @@ export default function PeerProvider({children}) {
     );
 
     Peer.ontrack = (ev) => {
+      console.log("Email of User Joined:", email);
+      console.log("Media Content", ev.streams[0]);
       onTrack(email, ev.streams[0])
     };
 

@@ -4,6 +4,16 @@ import { useSocket } from "../Provider/Socket";
 import { usePeer } from "../Provider/Peer";
 import { useUserContext } from "../Provider/UserContext";
 
+function RemoteVideo({ stream }) {
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) ref.current.srcObject = stream;
+  }, [stream]);
+
+  return <video ref={ref} autoPlay playsInline width={400} className="rounded-2xl" />;
+}
+
 export default function Room() {
   const { roomId } = useParams();
   const { socket } = useSocket();
@@ -17,10 +27,8 @@ export default function Room() {
   const joinedRef = useRef(false);
 
   const handleTrack = useCallback((email, stream) => {
-    setRemoteStreams((prev) => {
-      if (prev[email]) return prev;
-      return { ...prev, [email]: stream };
-    });
+    setRemoteStreams(prev => ({ ...prev, [email]: stream }));
+
   }, []);
 
   useEffect(() => {
@@ -35,19 +43,19 @@ export default function Room() {
   }, []);
 
   useEffect(() => {
-  if (!socket) return;
+    if (!socket) return;
 
-  socket.on("ice-candidate", async ({ from, candidate }) => {
-    const peer = getPeer(from);
-    if (peer && candidate) {
-      await peer.addIceCandidate(new RTCIceCandidate(candidate));
-    }
-  });
+    socket.on("ice-candidate", async ({ from, candidate }) => {
+      const peer = getPeer(from);
+      if (peer && candidate) {
+        await peer.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    });
 
-  return () => {
-    socket.off("ice-candidate");
-  };
-}, [socket, getPeer]);
+    return () => {
+      socket.off("ice-candidate");
+    };
+  }, [socket, getPeer]);
 
 
   useEffect(() => {
@@ -64,14 +72,20 @@ export default function Room() {
   const handleUserJoined = useCallback(
     ({ email }) => {
       if (email === user.email) return;
-      createPeer(email, socket, myStream, handleTrack, true);
+      if (!myStream) return;
+
+      console.log("Existing User")
+      createPeer(email, socket, myStream, handleTrack);
     },
     [createPeer, socket, myStream, handleTrack, user.email]
   );
 
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
-      const peer = createPeer(from, socket, myStream, handleTrack, false);
+      if (!myStream) return;
+
+      console.log("New User")
+      const peer = createPeer(from, socket, myStream, handleTrack);
       await peer.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
@@ -103,17 +117,12 @@ export default function Room() {
 
   return (
     <div>
-      <video ref={localVideoRef} autoPlay muted playsInline width={400} />
-      <div style={{ display: "flex", gap: 20 }}>
+      <video ref={localVideoRef} autoPlay muted playsInline width={500} className="rounded-2xl mb-5 md:ml-[25%]" />
+      <div className="flex gap-10 flex-wrap">
         {Object.entries(remoteStreams).map(([email, stream]) => (
-          <video
-            key={email}
-            autoPlay
-            playsInline
-            ref={(el) => el && (el.srcObject = stream)}
-            width={300}
-          />
+          <RemoteVideo key={email} stream={stream} />
         ))}
+
       </div>
     </div>
   );
