@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "../components/sidebar";
 import { useSocket } from "../Provider/Socket";
 import { useUserContext } from "../Provider/UserContext";
@@ -9,6 +9,7 @@ export default function Home() {
   const { user } = useUserContext();
   const location = useLocation();
   const navigate = useNavigate();
+  const {socket} = useSocket();
 
   const { code } = location.state || {};
   const [roomId, setRoomId] = useState(code || "");
@@ -51,9 +52,16 @@ export default function Home() {
   };
 
   const handleJoin = () => {
-    if (!roomId) return;
-    navigate(`/room/${roomId}`);
+    socket.emit("join-room", { email: user.email, roomId });
   };
+  const handleJoinedRoom = useCallback(({roomId}) => {
+    navigate(`/room/${roomId}`)
+  }, [navigate]);
+
+  useEffect(() => {
+    socket.on("joined-room", handleJoinedRoom);
+    return () => socket.off("joined-room", handleJoinedRoom)
+  }, [socket, handleJoinedRoom])
 
   return (
     <div className="flex min-h-screen bg-gray-50">

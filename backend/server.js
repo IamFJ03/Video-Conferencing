@@ -9,24 +9,30 @@ import path from "path";
 import cors from "cors";
 
 const app = express();
+
+/* ---------------- SOCKET SERVER ---------------- */
 const io = new Server({
   cors: {
     origin: "*",
   },
 });
 
+/* ---------------- MIDDLEWARE ---------------- */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const emailToSocket = new Map();    
-const socketToEmail = new Map();     
-const roomUsers = new Map();         
+/* ---------------- STATE ---------------- */
+const emailToSocket = new Map(); // email -> socketId
+const socketToEmail = new Map(); // socketId -> email
+const roomUsers = new Map();     // roomId -> Set<email>
 
+/* ---------------- SOCKET LOGIC ---------------- */
 io.on("connection", (socket) => {
   console.log("New socket connected:", socket.id);
 
+  /* ---------- JOIN ROOM ---------- */
   socket.on("join-room", ({ email, roomId }) => {
     console.log(`${email} joined room ${roomId}`);
 
@@ -37,48 +43,64 @@ io.on("connection", (socket) => {
       roomUsers.set(roomId, new Set());
     }
 
-    const existingUsers = Array.from(roomUsers.get(roomId));
-    roomUsers.get(roomId).add(email);
+    const usersInRoom = roomUsers.get(roomId);
+    const existingUsers = Array.from(usersInRoom);
 
+    usersInRoom.add(email);
     socket.join(roomId);
 
+    // send existing users to new joiner
     socket.emit("room-users", existingUsers);
 
+    // notify others
     socket.broadcast.to(roomId).emit("user-joined", { email });
-    socket.emit("joined-room", {roomId})
+
+    socket.emit("joined-room", { roomId });
   });
 
+  /* ---------- SEND OFFER ---------- */
   socket.on("call-user", ({ email, offer }) => {
     const fromEmail = socketToEmail.get(socket.id);
     const targetSocket = emailToSocket.get(email);
 
-    if (!targetSocket) return;
-    
-    console.log("call-user backend", targetSocket);
+
+    console.log("call-user backend →", email,"to:", targetSocket);
+
     socket.to(targetSocket).emit("incoming-call", {
       from: fromEmail,
       offer,
     });
   });
 
+  /* ---------- SEND ANSWER ---------- */
   socket.on("call-accepted", ({ email, ans }) => {
+    const fromEmail = socketToEmail.get(socket.id);
     const targetSocket = emailToSocket.get(email);
+
     if (!targetSocket) return;
-    
-    console.log("call-accepted backend")
-    socket.to(targetSocket).emit("call-accepted", { ans });
+
+    console.log("call-accepted backend →", email);
+
+    socket.to(targetSocket).emit("call-accepted", {
+      from: fromEmail,
+      ans,
+    });
   });
 
-  socket.on("ice-candidate", ({ email, candidate }) => {
-    const targetSocket = emailToSocket.get(email);
+  /* ---------- ICE CANDIDATE ---------- */
+  socket.on("ice-candidate", ({ to, candidate }) => {
+    const fromEmail = socketToEmail.get(socket.id);
+    const targetSocket = emailToSocket.get(to);
+
     if (!targetSocket) return;
 
     socket.to(targetSocket).emit("ice-candidate", {
-      from: socketToEmail.get(socket.id),
+      from: fromEmail,
       candidate,
     });
   });
 
+  /* ---------- DISCONNECT ---------- */
   socket.on("disconnect", () => {
     const email = socketToEmail.get(socket.id);
     if (!email) return;
@@ -91,7 +113,10 @@ io.on("connection", (socket) => {
     for (const [roomId, users] of roomUsers.entries()) {
       if (users.has(email)) {
         users.delete(email);
-        socket.broadcast.to(roomId).emit("user-left", { email });
+
+        socket.broadcast.to(roomId).emit("user-left", {
+          email,
+        });
 
         if (users.size === 0) {
           roomUsers.delete(roomId);
@@ -101,14 +126,17 @@ io.on("connection", (socket) => {
   });
 });
 
+/* ---------------- HTTP ROUTES ---------------- */
 app.use("/api/authentication", auth);
 app.use("/api/user", person);
 app.use("/api/meeting", meet);
+
 app.use(
   "/profile-picture",
   express.static(path.join(process.cwd(), "profile-picture"))
 );
 
+/* ---------------- START SERVERS ---------------- */
 app.listen(8000, () => {
   connectDB();
   console.log("HTTP server running on 8000");

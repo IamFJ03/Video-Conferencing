@@ -1,128 +1,181 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { useSocket } from "../Provider/Socket";
-import { usePeer } from "../Provider/Peer";
-import { useUserContext } from "../Provider/UserContext";
-
-function RemoteVideo({ stream }) {
-  const ref = useRef();
-
-  useEffect(() => {
-    if (ref.current) ref.current.srcObject = stream;
-  }, [stream]);
-
-  return <video ref={ref} autoPlay playsInline width={400} className="rounded-2xl" />;
-}
 
 export default function Room() {
-  const { roomId } = useParams();
   const { socket } = useSocket();
-  const { user } = useUserContext();
-  const { createPeer, getPeer } = usePeer();
 
+  /* ---------------- STATE ---------------- */
   const [myStream, setMyStream] = useState(null);
-  const [remoteStreams, setRemoteStreams] = useState({});
+  const [remoteStreams, setRemoteStreams] = useState({}); // email -> stream
+
+  const myStreamRef = useRef(null);
+  const mediaReadyRef = useRef(null);
+  const peersRef = useRef({}); // email -> RTCPeerConnection
 
   const localVideoRef = useRef(null);
-  const joinedRef = useRef(false);
 
-  const handleTrack = useCallback((email, stream) => {
-    setRemoteStreams(prev => ({ ...prev, [email]: stream }));
-
-  }, []);
-
+  /* ---------------- GET MEDIA (ONCE) ---------------- */
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+    mediaReadyRef.current = navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
       .then((stream) => {
+        myStreamRef.current = stream;
         setMyStream(stream);
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-      });
+        return stream;
+      })
+      .catch(console.error);
   }, []);
 
-  useEffect(() => {
-    if (!socket) return;
+  /* ---------------- CREATE PEER ---------------- */
+  const createPeer = useCallback((email) => {
+    if (peersRef.current[email]) return peersRef.current[email];
 
-    socket.on("ice-candidate", async ({ from, candidate }) => {
-      const peer = getPeer(from);
-      if (peer && candidate) {
-        await peer.addIceCandidate(new RTCIceCandidate(candidate));
-      }
+    console.log("Creating Peer for", email);
+
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
-    return () => {
-      socket.off("ice-candidate");
+    pc.ontrack = (ev) => {
+      console.log("ONTRACK FIRED from", email);
+      setRemoteStreams((prev) => ({
+        ...prev,
+        [email]: ev.streams[0],
+      }));
     };
-  }, [socket, getPeer]);
 
+    pc.onicecandidate = (ev) => {
+      if (ev.candidate) {
+        socket.emit("ice-candidate", {
+          to: email,
+          candidate: ev.candidate,
+        });
+      }
+    };
 
-  useEffect(() => {
-    if (!socket || !myStream || joinedRef.current) return;
+    peersRef.current[email] = pc;
+    return pc;
+  }, [socket]);
 
-    socket.emit("join-room", {
-      email: user.email,
-      roomId,
+  /* ---------------- USER JOINED ---------------- */
+  const handleUserJoined = useCallback(async ({ email }) => {
+    console.log("User joined:", email);
+
+    const stream = await mediaReadyRef.current;
+    const pc = createPeer(email);
+
+    stream.getTracks().forEach((track) => {
+      console.log("TRACK ADDED", track.kind, "to", email);
+      pc.addTrack(track, stream);
     });
 
-    joinedRef.current = true;
-  }, [socket, myStream, roomId, user.email]);
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
 
-  const handleUserJoined = useCallback(
-    ({ email }) => {
-      if (email === user.email) return;
-      if (!myStream) return;
+    socket.emit("call-user", { email, offer });
+  }, [createPeer, socket]);
 
-      console.log("Existing User")
-      createPeer(email, socket, myStream, handleTrack);
-    },
-    [createPeer, socket, myStream, handleTrack, user.email]
-  );
-
+  /* ---------------- INCOMING CALL ---------------- */
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
-      if (!myStream) return;
+      console.log("Incoming call from", from);
 
-      console.log("New User")
-      const peer = createPeer(from, socket, myStream, handleTrack);
-      await peer.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await peer.createAnswer();
-      await peer.setLocalDescription(answer);
-      socket.emit("call-accepted", { email: from, ans: answer });
+      const stream = await mediaReadyRef.current;
+      const pc = createPeer(from);
+
+      await pc.setRemoteDescription(offer);
+
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
+      });
+
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      socket.emit("call-accepted", {
+        email: from,
+        ans: answer,
+      });
     },
-    [createPeer, socket, myStream, handleTrack]
+    [createPeer, socket]
   );
 
-  const handleCallAccepted = useCallback(
-    async ({ from, ans }) => {
-      const peer = getPeer(from);
-      if (!peer) return;
-      await peer.setRemoteDescription(new RTCSessionDescription(ans));
+  /* ---------------- CALL ACCEPTED ---------------- */
+  const handleCallAccepted = useCallback(async ({ from, ans }) => {
+    console.log("Call accepted by", from);
+    const pc = peersRef.current[from];
+    if (!pc) return;
+    await pc.setRemoteDescription(ans);
+  }, []);
+
+  /* ---------------- ICE CANDIDATE ---------------- */
+  const handleIceCandidate = useCallback(
+    async ({ from, candidate }) => {
+      const pc = peersRef.current[from];
+      if (!pc) return;
+      await pc.addIceCandidate(candidate);
     },
-    [getPeer]
+    []
   );
 
+  /* ---------------- SOCKET EVENTS ---------------- */
   useEffect(() => {
     socket.on("user-joined", handleUserJoined);
     socket.on("incoming-call", handleIncomingCall);
     socket.on("call-accepted", handleCallAccepted);
+    socket.on("ice-candidate", handleIceCandidate);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
       socket.off("incoming-call", handleIncomingCall);
       socket.off("call-accepted", handleCallAccepted);
+      socket.off("ice-candidate", handleIceCandidate);
     };
-  }, [socket, handleUserJoined, handleIncomingCall, handleCallAccepted]);
+  }, [
+    socket,
+    handleUserJoined,
+    handleIncomingCall,
+    handleCallAccepted,
+    handleIceCandidate,
+  ]);
 
+  /* ---------------- LOCAL VIDEO ---------------- */
+  useEffect(() => {
+    if (localVideoRef.current && myStream) {
+      localVideoRef.current.srcObject = myStream;
+    }
+  }, [myStream]);
+
+  /* ---------------- UI ---------------- */
   return (
     <div>
-      <video ref={localVideoRef} autoPlay muted playsInline width={500} className="rounded-2xl mb-5 md:ml-[25%]" />
-      <div className="flex gap-10 flex-wrap">
-        {Object.entries(remoteStreams).map(([email, stream]) => (
-          <RemoteVideo key={email} stream={stream} />
-        ))}
+      <h2>Room</h2>
 
+      <video
+        ref={localVideoRef}
+        autoPlay
+        muted
+        playsInline
+        className="rounded-2xl md:ml-[30%] mb-10"
+        style={{ width: "400px" }}
+      />
+
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        {Object.entries(remoteStreams).map(([email, stream]) => (
+          <video
+            key={email}
+            autoPlay
+            playsInline
+            ref={(el) => el && (el.srcObject = stream)}
+            className="rounded-2xl ml-[10%] md:ml-0"
+            style={{ width: "300px" }}
+          />
+        ))}
       </div>
     </div>
   );

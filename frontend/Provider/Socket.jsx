@@ -1,17 +1,22 @@
-import React,{createContext, useMemo} from 'react'
-import { io } from 'socket.io-client'
+import React, { createContext, useContext, useRef } from "react";
+import { io } from "socket.io-client";
 
-export const GlobalContext = createContext(null)
+export const GlobalContext = createContext(null);
 
-export const useSocket = () => {
-  return React.useContext(GlobalContext)
-}
+export const useSocket = () => useContext(GlobalContext);
 
-export default function Socket({children}) {
-  const socket = useMemo(() => io("http://localhost:8001"), [])
-  return <GlobalContext.Provider
-  value={{ socket }}
-  >
-    {children}
-  </GlobalContext.Provider>
+export default function Socket({ children }) {
+  const socketRef = useRef(null);
+
+  if (!socketRef.current) {
+    socketRef.current = io("http://localhost:8001", {
+      transports: ["websocket"],
+    });
+  }
+
+  return (
+    <GlobalContext.Provider value={{ socket: socketRef.current }}>
+      {children}
+    </GlobalContext.Provider>
+  );
 }
