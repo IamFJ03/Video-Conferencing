@@ -89,13 +89,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow">
+          <div className="bg-white rounded-xl p-6 shadow relative">
             <h1 className="text-2xl font-bold mb-4">Join Room</h1>
 
             <input
-              value={user.email}
+              value={user.email ? user.email : "Login required"}
               disabled
-              className="w-full mb-4 p-2 bg-gray-100"
+              className="w-full mb-4 p-2 bg-gray-100 text-gray-500"
             />
 
             <input
@@ -111,6 +111,10 @@ export default function Home() {
             >
               Join
             </button>
+            <div className="text-left ml-2 my-7">
+            <p>Turn Audio On<input type="checkbox" className="ml-10" onClick={toggleMic} checked={mic}/></p>
+            <p className="mt-5">Turn Video On<input type="checkbox" className="ml-10" onClick={toggleVideo} checked={vid}/></p>
+            </div>
           </div>
 
         </div>

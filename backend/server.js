@@ -10,29 +10,24 @@ import cors from "cors";
 
 const app = express();
 
-/* ---------------- SOCKET SERVER ---------------- */
 const io = new Server({
   cors: {
     origin: "*",
   },
 });
 
-/* ---------------- MIDDLEWARE ---------------- */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-/* ---------------- STATE ---------------- */
-const emailToSocket = new Map(); // email -> socketId
-const socketToEmail = new Map(); // socketId -> email
-const roomUsers = new Map();     // roomId -> Set<email>
+const emailToSocket = new Map();
+const socketToEmail = new Map();
+const roomUsers = new Map();
 
-/* ---------------- SOCKET LOGIC ---------------- */
 io.on("connection", (socket) => {
   console.log("New socket connected:", socket.id);
 
-  /* ---------- JOIN ROOM ---------- */
   socket.on("join-room", ({ email, roomId }) => {
     console.log(`${email} joined room ${roomId}`);
 
@@ -49,16 +44,13 @@ io.on("connection", (socket) => {
     usersInRoom.add(email);
     socket.join(roomId);
 
-    // send existing users to new joiner
     socket.emit("room-users", existingUsers);
 
-    // notify others
     socket.broadcast.to(roomId).emit("user-joined", { email });
 
     socket.emit("joined-room", { roomId });
   });
 
-  /* ---------- SEND OFFER ---------- */
   socket.on("call-user", ({ email, offer }) => {
     const fromEmail = socketToEmail.get(socket.id);
     const targetSocket = emailToSocket.get(email);
@@ -72,7 +64,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  /* ---------- SEND ANSWER ---------- */
   socket.on("call-accepted", ({ email, ans }) => {
     const fromEmail = socketToEmail.get(socket.id);
     const targetSocket = emailToSocket.get(email);
@@ -87,7 +78,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  /* ---------- ICE CANDIDATE ---------- */
   socket.on("ice-candidate", ({ to, candidate }) => {
     const fromEmail = socketToEmail.get(socket.id);
     const targetSocket = emailToSocket.get(to);
@@ -100,7 +90,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  /* ---------- DISCONNECT ---------- */
   socket.on("disconnect", () => {
     const email = socketToEmail.get(socket.id);
     if (!email) return;
@@ -126,7 +115,6 @@ io.on("connection", (socket) => {
   });
 });
 
-/* ---------------- HTTP ROUTES ---------------- */
 app.use("/api/authentication", auth);
 app.use("/api/user", person);
 app.use("/api/meeting", meet);
@@ -136,7 +124,6 @@ app.use(
   express.static(path.join(process.cwd(), "profile-picture"))
 );
 
-/* ---------------- START SERVERS ---------------- */
 app.listen(8000, () => {
   connectDB();
   console.log("HTTP server running on 8000");

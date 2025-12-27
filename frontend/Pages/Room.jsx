@@ -9,17 +9,15 @@ import { useSocket } from "../Provider/Socket";
 export default function Room() {
   const { socket } = useSocket();
 
-  /* ---------------- STATE ---------------- */
   const [myStream, setMyStream] = useState(null);
-  const [remoteStreams, setRemoteStreams] = useState({}); // email -> stream
+  const [remoteStreams, setRemoteStreams] = useState({});
 
   const myStreamRef = useRef(null);
   const mediaReadyRef = useRef(null);
-  const peersRef = useRef({}); // email -> RTCPeerConnection
+  const peersRef = useRef({});
 
   const localVideoRef = useRef(null);
 
-  /* ---------------- GET MEDIA (ONCE) ---------------- */
   useEffect(() => {
     mediaReadyRef.current = navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
@@ -31,7 +29,6 @@ export default function Room() {
       .catch(console.error);
   }, []);
 
-  /* ---------------- CREATE PEER ---------------- */
   const createPeer = useCallback((email) => {
     if (peersRef.current[email]) return peersRef.current[email];
 
@@ -62,7 +59,6 @@ export default function Room() {
     return pc;
   }, [socket]);
 
-  /* ---------------- USER JOINED ---------------- */
   const handleUserJoined = useCallback(async ({ email }) => {
     console.log("User joined:", email);
 
@@ -80,7 +76,6 @@ export default function Room() {
     socket.emit("call-user", { email, offer });
   }, [createPeer, socket]);
 
-  /* ---------------- INCOMING CALL ---------------- */
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
       console.log("Incoming call from", from);
@@ -105,7 +100,6 @@ export default function Room() {
     [createPeer, socket]
   );
 
-  /* ---------------- CALL ACCEPTED ---------------- */
   const handleCallAccepted = useCallback(async ({ from, ans }) => {
     console.log("Call accepted by", from);
     const pc = peersRef.current[from];
@@ -113,7 +107,6 @@ export default function Room() {
     await pc.setRemoteDescription(ans);
   }, []);
 
-  /* ---------------- ICE CANDIDATE ---------------- */
   const handleIceCandidate = useCallback(
     async ({ from, candidate }) => {
       const pc = peersRef.current[from];
@@ -123,7 +116,6 @@ export default function Room() {
     []
   );
 
-  /* ---------------- SOCKET EVENTS ---------------- */
   useEffect(() => {
     socket.on("user-joined", handleUserJoined);
     socket.on("incoming-call", handleIncomingCall);
@@ -144,14 +136,12 @@ export default function Room() {
     handleIceCandidate,
   ]);
 
-  /* ---------------- LOCAL VIDEO ---------------- */
   useEffect(() => {
     if (localVideoRef.current && myStream) {
       localVideoRef.current.srcObject = myStream;
     }
   }, [myStream]);
 
-  /* ---------------- UI ---------------- */
   return (
     <div>
       <h2>Room</h2>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
+import { AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserContext } from '../Provider/UserContext';
 
@@ -13,6 +14,12 @@ export default function Authentication() {
   const [showError, setShowError] = useState(false);
   const { user, setUser } = useUserContext();
   const navigate = useNavigate();
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(email)
+  }
+
   const handleSignUp = async () => {
     try {
       if (username === "" || logEmail === "" || logPass === "") {
@@ -54,7 +61,20 @@ export default function Authentication() {
       setTimeout(() => {
         setShowError(false);
       }, 3000);
+      return;
     }
+
+    if (validateEmail(logEmail))
+      setErrorMsg("");
+    else {
+      setErrorMsg("Invalid Email Format");
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false)
+      }, 3000)
+      return;
+    }
+
     const response = await axios.post("http://localhost:8000/api/authentication/login", {
       email: logEmail,
       password: logPass
@@ -123,8 +143,12 @@ export default function Authentication() {
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
             className='absolute bottom-15 right-30'>
-            <div className='h-17 w-100 rounded-2xl py-2 shadow-2xl'>
-              <p className='text-left text-xl px-10'>Error</p>
+            <div className=' py-3 h-fit w-100 rounded-2xl shadow-2xl'>
+              <div className='flex items-center px-5 gap-5 mb-2'>
+                <AlertCircle size={25} color='black' />
+                <p className='text-left text-xl'>Error</p>
+              </div>
+
               <p className='text-gray-400 text-left px-5'>{errorMsg}</p>
             </div>
           </motion.div>
