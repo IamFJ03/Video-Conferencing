@@ -30,6 +30,10 @@ const meetInfoSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    expireAt: {
+    type: Date,
+    index: { expires: 0 }
+  }
 }, {
    
     toJSON: { getters: true },

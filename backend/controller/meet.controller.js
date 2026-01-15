@@ -7,8 +7,11 @@ const meetInfoSave = async (req, res) => {
     console.log("Username:", username);
     console.log("Title of meeting:", title);
     console.log("Date:", date, "and Time:", time);
+
+    const expireAt = new Date(Date.now() + 60 * 1000);
+
     const info = {
-        username, title, date, time, link, description
+        username, title, date, time, link, description, expireAt
     }
     console.log("Meeting Scheduled");
     const addMeetInfo = await meetInfo.create(info)
