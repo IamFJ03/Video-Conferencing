@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { PhoneOff, Video, VideoOff, Mic, MicOff } from "lucide-react"
 import { useSocket } from "../Provider/Socket";
 
 export default function Room() {
@@ -11,7 +12,8 @@ export default function Room() {
 
   const [myStream, setMyStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState({});
-
+  const [vid, setVid] = useState(true);
+  const [mic, setMic] = useState(true);
   const myStreamRef = useRef(null);
   const mediaReadyRef = useRef(null);
   const peersRef = useRef({});
@@ -142,6 +144,10 @@ export default function Room() {
     }
   }, [myStream]);
 
+  const handleEndCall = () => {
+
+  }
+
   return (
     <div>
       <h2>Room</h2>
@@ -166,6 +172,17 @@ export default function Room() {
             style={{ width: "300px" }}
           />
         ))}
+      </div>
+      <div className="flex items-center gap-10">
+        <div className="bg-red-500 w-fit p-3 rounded-full cursor-pointer hover:bg-red-700 transition-all duration-500">
+          <PhoneOff size={30} color="white" onClick={handleEndCall} />
+        </div>
+        <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer ">
+          <Video size={30} color="black" />
+        </div>
+        <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer ">
+          <Mic size={30} color="black" />
+        </div>
       </div>
     </div>
   );

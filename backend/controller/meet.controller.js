@@ -8,8 +8,7 @@ const meetInfoSave = async (req, res) => {
     console.log("Title of meeting:", title);
     console.log("Date:", date, "and Time:", time);
 
-    const expireAt = new Date(Date.now() + 60 * 1000);
-
+    const expireAt = new Date(`${date}T${time}:00`)
     const info = {
         username, title, date, time, link, description, expireAt
     }
