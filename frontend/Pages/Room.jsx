@@ -7,6 +7,7 @@ import React, {
 import { PhoneOff, Video, VideoOff, Mic, MicOff } from "lucide-react"
 import { useSocket } from "../Provider/Socket";
 import { useUserContext } from "../Provider/UserContext";
+import { usePeer } from "../Provider/Peer";
 import { useNavigate } from "react-router-dom";
 
 export default function Room() {
@@ -16,24 +17,22 @@ export default function Room() {
   const peersRef = useRef({});
   const [vid, setVid] = useState(true);
   const [mic, setMic] = useState(true);
-  const myStreamRef = useRef(null);
+  const { videoRef, streamRef } = usePeer();
   const [myStream, setMyStream] = useState(null);
-  const mediaReadyRef = useRef(null);
   const { user } = useUserContext()
 
   const localVideoRef = useRef(null);
 
-  useEffect(() => {
-    mediaReadyRef.current = navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        myStreamRef.current = stream;
-        setMyStream(stream);
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream
-        return stream;
-      })
-      .catch(console.error);
+    useEffect(() => {
+    const stream = streamRef.current;
+    console.log("stream value", stream);
+    console.log("videoRef.current.srcObject Value:", streamRef.current)
+    if (stream) {
+      
+      if (localVideoRef.current) localVideoRef.current.srcObject = stream
+    }
   }, []);
+  
 
   const createPeer = useCallback((email) => {
     if (peersRef.current[email]) return peersRef.current[email];
@@ -72,7 +71,8 @@ export default function Room() {
   const handleUserJoined = useCallback(async ({ email }) => {
     console.log("User joined:", email);
 
-    const stream = await mediaReadyRef.current;
+    const stream = streamRef.current;
+    if (!stream) return;
     const pc = createPeer(email);
 
     stream.getTracks().forEach((track) => {
@@ -90,7 +90,8 @@ export default function Room() {
     async ({ from, offer }) => {
       console.log("Incoming call from", from);
 
-      const stream = await mediaReadyRef.current;
+      const stream = streamRef.current;
+if (!stream) return;
       const pc = createPeer(from);
 
       await pc.setRemoteDescription(offer);
@@ -119,13 +120,13 @@ export default function Room() {
 
   const handleUserLeft = (email) => {
     const pc = peersRef.current[email];
-    if(pc){
+    if (pc) {
       pc.close();
       delete peersRef.current[email];
     }
 
     setRemoteStreams(prev => {
-      const updated = {...prev};
+      const updated = { ...prev };
       delete updated[email];
       return updated;
     })
@@ -171,13 +172,13 @@ export default function Room() {
 
 
     setRemoteStreams({});
-    socket.emit("user-left", {email: user.email});
+    socket.emit("user-left", { email: user.email });
 
     navigate('/join-meeting')
   }
 
   const toggleMic = () => {
-    const track = myStream?.getAudioTracks()[0];
+    const track = streamRef.current?.getAudioTracks()[0];
     if (track) {
       track.enabled = !track.enabled;
       setMic(track.enabled);
@@ -185,7 +186,7 @@ export default function Room() {
   }
 
   const toggleVideo = () => {
-    const track = myStream?.getVideoTracks()[0];
+    const track = streamRef.current?.getVideoTracks()[0];
     if (track) {
       track.enabled = !track.enabled;
       setVid(track.enabled);

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "../components/sidebar";
 import { useSocket } from "../Provider/Socket";
 import { useUserContext } from "../Provider/UserContext";
+import { usePeer } from "../Provider/Peer";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Video, Mic, VideoOff, MicOff } from "lucide-react";
 
@@ -10,14 +11,15 @@ export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
   const {socket} = useSocket();
-
+  const {videoRef, streamRef} = usePeer();
   const { code } = location.state || {};
   const [roomId, setRoomId] = useState(code || "");
   const [myStream, setMyStream] = useState(null);
+  
   const [vid, setVid] = useState(true);
   const [mic, setMic] = useState(true);
 
-  const videoRef = useRef(null);
+  
 
   useEffect(() => {
     const fetchStream = async () => {
@@ -27,6 +29,7 @@ export default function Home() {
           audio: true,
         });
         setMyStream(stream);
+        streamRef.current = stream
         if (videoRef.current) videoRef.current.srcObject = stream;
       } catch (err) {
         console.error("Media error:", err);

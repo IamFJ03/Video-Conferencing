@@ -5,14 +5,11 @@ const GlobalContext = createContext(null)
 export const usePeer = () => useContext(GlobalContext)
 
 export default function PeerProvider({ children }) {
-    const Peer = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-      ],
-    });
+    const videoRef = useRef(null);
+    const streamRef = useRef(null);
 
   return (
-    <GlobalContext.Provider value={{ Peer }}>
+    <GlobalContext.Provider value={{ videoRef, streamRef }}>
       {children}
     </GlobalContext.Provider>
   )
