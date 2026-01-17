@@ -14,9 +14,10 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage});
 
 const router = express.Router();
-import { SaveUser,fetchData } from "../controller/User.controller.js";
+import { SaveUser,fetchData, me } from "../controller/User.controller.js";
 
 router.post('/saveUser', upload.single('profilePicture'),Authenticate, SaveUser);
 router.post('/fetchData', Authenticate, fetchData);
+router.get('/myself', me);
 
 export default router;

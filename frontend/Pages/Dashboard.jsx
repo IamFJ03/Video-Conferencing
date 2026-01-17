@@ -1,9 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Home, User, Calendar, Settings, LogOut, LogIn, Video, Users } from 'lucide-react';
 import Sidebar from '../components/sidebar';
+import axios from "axios"
+import { useUserContext } from '../Provider/UserContext';
+
 
 export default function Dashboard() {
+  const {setUser} = useUserContext();
+  useEffect(() => {
+  const fetchUser = async () => {
+    const res = await axios.get("http://localhost:8000/api/user/myself",{
+      withCredentials: true
+    });
+
+    if(res.data.message === "Unauthorized") throw new Error("Might be some error")
+
+    console.log(res.data.user)
+    setUser(res.data.user)
+  }
+
+  fetchUser();
+},[])
   return (
     <div>
       <div className='md:flex'>

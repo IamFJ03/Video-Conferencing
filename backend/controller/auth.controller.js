@@ -34,16 +34,16 @@ const login = async (req, res) => {
         let user = await User.findOne({ Email: email });
         if (user) {
             const USER = { id: user._id, username: user.Username, email: user.Email, password: user.password };
-            const token = jwt.sign(USER, jwtKey, { expiresIn: '24h' }, (err, token) => {
-                res.json({ message: "Authentication Succesfull", token, newUser: USER });
-            })
+            const token = jwt.sign(USER, jwtKey, { expiresIn: '24h' });
 
             res.cookie("token", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                maxAge: 60*60*10
-            })
+                maxAge: 1000 * 60 * 60 * 10 // 10 hours
+            });
+
+            res.json({ message: "Authentication Successful", token, newUser: USER });
 
             const otp = otpGenerator.generate(6, {
                 digits: true,

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Person } from "../model/User.model.js";
 import multer from 'multer';
 import express from 'express';
+import jwt from "jsonwebtoken";
 
 const SaveUser = async (req, res) => {
     const { fullname, nickname, gender, country, language, contact } = req.body;
@@ -64,4 +65,23 @@ const fetchData = async (req, res) => {
      }
 }
 
-export{SaveUser, fetchData}
+const me = async (req, res) => {
+  const token = req.cookies.token;
+console.log("Cookie received:", req.cookies.token);
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decode = jwt.verify(token, process.env.JWT_KEY);
+    console.log(decode);
+    res.json({ user: decode });
+  } catch (err) {
+    console.error("JWT verification failed:", err.message);
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+
+export{SaveUser, fetchData, me}

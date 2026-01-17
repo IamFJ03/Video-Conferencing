@@ -82,7 +82,7 @@ export default function Authentication() {
       withCredentials: true
     });
 
-    if (response.data.message === "Authentication Succesfull") {
+    if (response.data.message === "Authentication Successful") {
       console.log("User Found:", response.data.newUser);
     
       await localStorage.setItem("token", response.data.token);
