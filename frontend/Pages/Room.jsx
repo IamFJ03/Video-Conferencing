@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import { PhoneOff, Video, VideoOff, Mic, MicOff } from "lucide-react"
 import { useSocket } from "../Provider/Socket";
+import { useUserContext } from "../Provider/UserContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Room() {
@@ -18,7 +19,7 @@ export default function Room() {
   const myStreamRef = useRef(null);
   const [myStream, setMyStream] = useState(null);
   const mediaReadyRef = useRef(null);
-  
+  const { user } = useUserContext()
 
   const localVideoRef = useRef(null);
 
@@ -28,7 +29,7 @@ export default function Room() {
       .then((stream) => {
         myStreamRef.current = stream;
         setMyStream(stream);
-        if(localVideoRef.current) localVideoRef.current.srcObject = stream
+        if (localVideoRef.current) localVideoRef.current.srcObject = stream
         return stream;
       })
       .catch(console.error);
@@ -42,7 +43,7 @@ export default function Room() {
     const pc = new RTCPeerConnection({
       iceServers: [
         {
-          urls: "stun:stun.l.google.com:19302" 
+          urls: "stun:stun.l.google.com:19302"
         }
       ],
     });
@@ -116,6 +117,20 @@ export default function Room() {
     await pc.setRemoteDescription(ans);
   }, []);
 
+  const handleUserLeft = (email) => {
+    const pc = peersRef.current[email];
+    if(pc){
+      pc.close();
+      delete peersRef.current[email];
+    }
+
+    setRemoteStreams(prev => {
+      const updated = {...prev};
+      delete updated[email];
+      return updated;
+    })
+  }
+
   const handleIceCandidate = useCallback(
     async ({ from, candidate }) => {
       const pc = peersRef.current[from];
@@ -130,30 +145,40 @@ export default function Room() {
     socket.on("incoming-call", handleIncomingCall);
     socket.on("call-accepted", handleCallAccepted);
     socket.on("ice-candidate", handleIceCandidate);
+    socket.on("userLeft", handleUserLeft);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
       socket.off("incoming-call", handleIncomingCall);
       socket.off("call-accepted", handleCallAccepted);
       socket.off("ice-candidate", handleIceCandidate);
+      socket.off("userLeft", handleUserLeft);
     };
   }, [
     socket,
     handleUserJoined,
     handleIncomingCall,
     handleCallAccepted,
+    handleUserLeft,
     handleIceCandidate,
   ]);
 
   const handleEndCall = () => {
-      localVideoRef.current.srcObject = null;
-      
-      navigate('/join-meeting')
+    Object.entries(peersRef.current).forEach(([email, pc]) => {
+      pc.close();
+      delete peersRef.current[email];
+    });
+
+
+    setRemoteStreams({});
+    socket.emit("user-left", {email: user.email});
+
+    navigate('/join-meeting')
   }
 
   const toggleMic = () => {
     const track = myStream?.getAudioTracks()[0];
-    if(track){
+    if (track) {
       track.enabled = !track.enabled;
       setMic(track.enabled);
     }
@@ -161,7 +186,7 @@ export default function Room() {
 
   const toggleVideo = () => {
     const track = myStream?.getVideoTracks()[0];
-    if(track){
+    if (track) {
       track.enabled = !track.enabled;
       setVid(track.enabled);
     }
@@ -199,19 +224,19 @@ export default function Room() {
         <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer" onClick={toggleVideo}>
           {
             vid
-            ?
-            <Video size={30} color="black" />
-            :
-            <VideoOff size={30} color="black" />
+              ?
+              <Video size={30} color="black" />
+              :
+              <VideoOff size={30} color="black" />
           }
         </div>
         <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer" onClick={toggleMic}>
           {
             mic
-            ?
-            <Mic size={30} color="black" />
-            :
-            <MicOff size={30} color="black" />
+              ?
+              <Mic size={30} color="black" />
+              :
+              <MicOff size={30} color="black" />
           }
         </div>
       </div>

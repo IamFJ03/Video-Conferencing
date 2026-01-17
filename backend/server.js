@@ -77,6 +77,10 @@ io.on("connection", (socket) => {
       ans,
     });
   });
+  
+  socket.on("user-left", ({email}) => {
+socket.broadcast.emit("userLeft", email)
+  })
 
   socket.on("ice-candidate", ({ to, candidate }) => {
     const fromEmail = socketToEmail.get(socket.id);
