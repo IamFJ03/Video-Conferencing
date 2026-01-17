@@ -7,19 +7,25 @@ import meet from "./routes/meet.routes.js";
 import bodyParser from "body-parser";
 import path from "path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 const io = new Server({
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
+    credentials: true
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 const emailToSocket = new Map();
 const socketToEmail = new Map();

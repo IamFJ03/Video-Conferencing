@@ -37,6 +37,14 @@ const login = async (req, res) => {
             const token = jwt.sign(USER, jwtKey, { expiresIn: '24h' }, (err, token) => {
                 res.json({ message: "Authentication Succesfull", token, newUser: USER });
             })
+
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                maxAge: 60*60*10
+            })
+
             const otp = otpGenerator.generate(6, {
                 digits: true,
                 lowerCaseAlphabets: false,

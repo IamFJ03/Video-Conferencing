@@ -78,11 +78,13 @@ export default function Authentication() {
     const response = await axios.post("http://localhost:8000/api/authentication/login", {
       email: logEmail,
       password: logPass
+    },{
+      withCredentials: true
     });
 
     if (response.data.message === "Authentication Succesfull") {
       console.log("User Found:", response.data.newUser);
-      setUser(response.data.newUser);
+    
       await localStorage.setItem("token", response.data.token);
       navigate(`/home/${logEmail}`, {
         state: {
