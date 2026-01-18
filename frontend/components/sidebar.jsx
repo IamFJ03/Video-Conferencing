@@ -43,7 +43,7 @@ export default function sidebar() {
         </div>
       </div>
       <div className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-black z-50 flex justify-around items-center">
-  <Link to="/home">
+  <Link to="/">
     <Home color="white" size={28} strokeWidth={1.5} />
   </Link>
   <Link to="/schedule">

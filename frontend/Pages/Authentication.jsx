@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle,Eye,EyeClosed } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserContext } from '../Provider/UserContext';
 
@@ -12,7 +12,7 @@ export default function Authentication() {
   const [username, setUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
-  const { user, setUser } = useUserContext();
+  const[showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -104,7 +104,7 @@ export default function Authentication() {
     }
   }
   return (
-    <div className='flex justify-center overflow-hidden w-90 md:w-screen h-fit py-10'>
+    <div className='flex justify-center overflow-hidden w-screen md:w-screen h-fit py-10'>
       {viewType === "login" ?
         (
           <div>
@@ -114,8 +114,17 @@ export default function Authentication() {
               <p className='text-left pt-5 mb-2 text-lg ml-[10%] md:ml-0'>Email:</p>
               <input placeholder='Enter Email' type='email' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
               <p className='text-left mb-2 pt-5 text-lg ml-[10%] md:ml-0'>Password:</p>
-              <input placeholder='Enter Password' type='password' className='border-1 w-55 md:w-70 py-1 px-2 rounded mb-5' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
-              <button className='bg-gray-900 text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
+              <div className='flex items-center relative w-55 md:w-70 ml-[11%] md:ml-0'>
+                <input placeholder='Enter Password' type={`${showPass ? 'text' : 'password'}`} className='border-1 w-full py-1 px-2 rounded mb-5' value={logPass} onChange={(e) => setLogPass(e.target.value)} />
+                {
+                  showPass
+                  ?
+                  <EyeClosed size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)}/>
+                  :
+                  <Eye size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)}/>
+                }
+              </div>
+              <button className='bg-black text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
               <span>Don't have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("signup")}>Sign Up</span>
             </div>
 
@@ -123,7 +132,7 @@ export default function Authentication() {
         )
         :
         (
-          <div className=' h-140 rounded-2xl p-10 shadow-xl -ml-7 md:-ml-100 mt-20 md:mt-0 min-w-70 '>
+          <div className=' h-140 rounded-2xl p-10 shadow-xl -ml-7 md:-ml-100 mt-10 md:mt-0 min-w-70 '>
             <p className='text-black font-bold text-2xl'>Welcome to MeetConf</p>
             <p className='text-gray-400 w-60'>Sign Up to have video conferencing with close ones, meet ups etc.</p>
             <p className='text-left md:ml-0 pt-5 mb-2 text-lg ml-[10%]'>UserName:</p>
@@ -131,8 +140,17 @@ export default function Authentication() {
             <p className='text-left md:ml-0 pt-5 mb-2 text-lg ml-[10%]'>Email:</p>
             <input placeholder='Enter Email' type='email' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
             <p className='text-left md:ml-0 mb-2 pt-5 text-lg ml-[10%]'>Password:</p>
-            <input placeholder='Enter Password' type='password' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} /><br />
-            <button className='bg-gray-900 text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
+            <div className='flex items-center relative w-55 md:w-70 ml-[5%] md:ml-0'>
+                <input placeholder='Enter Password' type={`${showPass ? 'text' : 'password'}`} className='border-1 w-full py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} />
+                {
+                  showPass
+                  ?
+                  <EyeClosed size={25} color='black' className='absolute right-3 ' onClick={() => setShowPass(!showPass)}/>
+                  :
+                  <Eye size={25} color='black' className='absolute right-1' onClick={() => setShowPass(!showPass)}/>
+                }
+              </div>
+            <button className='bg-black text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
             <span>Already have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("login")}>Log In</span>
           </div>
         )
@@ -144,8 +162,8 @@ export default function Authentication() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
-            className='absolute bottom-15 right-30'>
-            <div className=' py-3 h-fit w-100 rounded-2xl shadow-2xl'>
+            className='fixed bottom-10 inset-x-5 z-50 md:absolute md:bottom-15 md:right-30'>
+            <div className=' py-3 h-fit md:w-100 w-90 rounded-2xl shadow-2xl'>
               <div className='flex items-center px-5 gap-5 mb-2'>
                 <AlertCircle size={25} color='black' />
                 <p className='text-left text-xl'>Error</p>
