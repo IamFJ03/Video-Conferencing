@@ -1,8 +1,19 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import axios from 'axios';
+import { Link,useNavigate } from 'react-router-dom'
 import { Home, User, Calendar, Settings, LogOut } from 'lucide-react';
 
 export default function sidebar() {
+  const navigate = useNavigate();
+  const handleLogOut = async () => {
+    const res = await axios.get("http://localhost:8000/api/authentication/logout",{
+      withCredentials: true
+    });
+
+    if(res.data.message === "Logged Out Successfully")
+      navigate("/auth")
+  }
+
   return (
     <div>
       <div className='hidden md:block h-screen bg-black w-50 bottom-8 md:right-39 right-8 relative'>
@@ -26,10 +37,10 @@ export default function sidebar() {
           </li>
 
         </ul>
-        <p className='text-white pt-10 flex flex-row items-center absolute bottom-10 border-t-1 w-50'>
+        <div className='text-white pt-10 flex flex-row items-center absolute bottom-10 border-t-1 w-50' onClick={handleLogOut}>
           <LogOut color='white' size={20} strokeWidth={1.5} className='ml-10 mr-2' />
           <span className=''>LogOut</span>
-        </p>
+        </div>
       </div>
       <div className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-black z-50 flex justify-around items-center">
   <Link to="/home">

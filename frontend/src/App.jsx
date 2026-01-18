@@ -21,10 +21,10 @@ function App() {
       <PeerProvider>
         <UserContext>
           <Routes>
-            <Route path='/' element={<Authentication />} />
+            <Route path='/auth' element={<Authentication />} />
             <Route path='/verification' element={<Verification />} />
             <Route path='/join-meeting' element={<Home />} />
-            <Route path='/home/:email' element={<Dashboard />} />
+            <Route path='/' element={<Dashboard />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/schedule' element={<Schedule />} />
             <Route path='/setting' element={<Setting />} />

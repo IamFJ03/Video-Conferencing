@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Home, User, Calendar, Settings, LogOut, LogIn, Video, Users } from 'lucide-react';
 import Sidebar from '../components/sidebar';
 import axios from "axios"
@@ -7,27 +7,30 @@ import { useUserContext } from '../Provider/UserContext';
 
 
 export default function Dashboard() {
-  const {setUser} = useUserContext();
+  const { setUser } = useUserContext();
+  const navigate = useNavigate();
   useEffect(() => {
-  const fetchUser = async () => {
-    const res = await axios.get("http://localhost:8000/api/user/myself",{
-      withCredentials: true
-    });
+    const fetchUser = async () => {
+      const res = await axios.get("http://localhost:8000/api/user/myself", {
+        withCredentials: true
+      });
 
-    if(res.data.message === "Unauthorized") throw new Error("Might be some error")
+      if (res.data.message === "Unauthorized") {
+        navigate("/auth")
+      }
 
-    console.log(res.data.user)
-    setUser(res.data.user)
-  }
+      console.log(res.data.user)
+      setUser(res.data.user)
+    }
 
-  fetchUser();
-},[])
+    fetchUser();
+  }, [])
   return (
     <div>
       <div className='md:flex'>
         <Sidebar />
         <div className='md:hidden bg-black h-30 absolute top-0 w-full left-0'>
-          
+
           <p className='font-mono text-white text-4xl pt-10'>MeetConf</p>
         </div>
         <div className='flex flex-col md:flex-row md:justify-center md:gap-40 mt-40 mb-20 md:mb-0 md:mt-20 md:ml-20 ml-10 md:flex-wrap gap-10'>

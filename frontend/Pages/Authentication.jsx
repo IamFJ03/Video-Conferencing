@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import { AlertCircle } from 'lucide-react'
@@ -86,7 +86,7 @@ export default function Authentication() {
       console.log("User Found:", response.data.newUser);
     
       await localStorage.setItem("token", response.data.token);
-      navigate(`/home/${logEmail}`, {
+      navigate(`/`, {
         state: {
           email: logEmail
         }

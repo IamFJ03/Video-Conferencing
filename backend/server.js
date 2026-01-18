@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
     const targetSocket = emailToSocket.get(email);
 
 
-    console.log("call-user backend →", email,"to:", targetSocket);
+    console.log("call-user backend →", email, "to:", targetSocket);
 
     socket.to(targetSocket).emit("incoming-call", {
       from: fromEmail,
@@ -83,9 +83,9 @@ io.on("connection", (socket) => {
       ans,
     });
   });
-  
-  socket.on("user-left", ({email}) => {
-socket.broadcast.emit("userLeft", email)
+
+  socket.on("user-left", ({ email }) => {
+    socket.broadcast.emit("userLeft", email)
   })
 
   socket.on("ice-candidate", ({ to, candidate }) => {
@@ -129,7 +129,7 @@ app.use("/api/authentication", auth);
 app.use("/api/user", person);
 app.use("/api/meeting", meet);
 
-app.use("/profile-picture",express.static(path.join(process.cwd(), "profile-picture")));
+app.use("/profile-picture", express.static(path.join(process.cwd(), "profile-picture")));
 
 app.listen(8000, () => {
   connectDB();

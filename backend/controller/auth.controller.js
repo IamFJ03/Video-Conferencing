@@ -40,7 +40,7 @@ const login = async (req, res) => {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                maxAge: 1000 * 60 * 60 * 10 // 10 hours
+                maxAge: 1000 * 60 * 60 * 10
             });
 
             res.json({ message: "Authentication Successful", token, newUser: USER });
@@ -114,4 +114,14 @@ const verify = async (req, res) => {
     }
 }
 
-export { SignUp, login, verify, Authenticate }
+const logout = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" :"lax",
+    });
+
+    res.status(200).json({message: "Logged Out Successfully"})
+}
+
+export { SignUp, login, verify, Authenticate, logout }
