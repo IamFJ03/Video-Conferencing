@@ -14,7 +14,7 @@ export default function Profile() {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.post(
-          'http://localhost:8000/api/user/fetchData',
+          `${import.meta.env.VITE_API_URL}/api/user/fetchData`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );

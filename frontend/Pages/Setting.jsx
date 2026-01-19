@@ -25,7 +25,7 @@ export default function Setting() {
     if (profilePicture) formData.append('profilePicture', profilePicture);
 
     try {
-      await axios.post('http://localhost:8000/api/user/saveUser', formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/user/saveUser`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (e) {}

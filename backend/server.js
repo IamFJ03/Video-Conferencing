@@ -8,26 +8,23 @@ import bodyParser from "body-parser";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import http from "http";
 const app = express();
+const server = http.createServer(app);
+const PORT = process.env.PORT || 8000;
 
-const io = new Server({
+const io = new Server(server,{
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://192.168.29.82:5173"
-    ],
+    origin: process.env.CLIENT_URL,
     credentials: true
   },
 });
 
 app.use(cors({
-  origin: [
-      "http://localhost:5173",
-      "http://192.168.29.82:5173"
-    ],
+  origin: process.env.CLIENT_URL,
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -137,10 +134,7 @@ app.use("/api/meeting", meet);
 
 app.use("/profile-picture", express.static(path.join(process.cwd(), "profile-picture")));
 
-app.listen(8000, () => {
+server.listen(PORT, () => {
   connectDB();
-  console.log("HTTP server running on 8000");
+  console.log("Server running on 8000 with Socket.io");
 });
-
-io.listen(8001);
-console.log("Socket server running on 8001");

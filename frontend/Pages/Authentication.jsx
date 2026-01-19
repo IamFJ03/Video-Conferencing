@@ -30,7 +30,7 @@ export default function Authentication() {
         }, 3000);
         return;
       };
-      const response = await axios.post("http://localhost:8000/api/authentication/Signup", {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/Signup`, {
         username: username,
         email: logEmail,
         password: logPass
@@ -75,7 +75,7 @@ export default function Authentication() {
       return;
     }
 
-    const response = await axios.post("http://localhost:8000/api/authentication/login", {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/login`, {
       email: logEmail,
       password: logPass
     },{

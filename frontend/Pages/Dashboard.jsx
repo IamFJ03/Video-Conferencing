@@ -11,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios.get("http://localhost:8000/api/user/myself", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/myself`, {
         withCredentials: true
       });
 

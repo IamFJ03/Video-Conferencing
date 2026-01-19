@@ -49,7 +49,7 @@ export default function Verification()  {
         setMessage('');
 
         try {
-            const response = await axios.post("http://localhost:8000/api/authentication/verify-otp", {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/verify-otp`, {
                 email: userEmail,
                 otp: otp
             });
@@ -81,7 +81,7 @@ export default function Verification()  {
         setResendTimer(60);  
 
         try {
-            const response = await axios.post("http://localhost:8000/api/authentication/resend-otp", { 
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/resend-otp`, { 
                  email: userEmail 
             });
 

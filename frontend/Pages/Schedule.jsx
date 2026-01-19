@@ -13,7 +13,7 @@ export default function Schedule() {
   useEffect(() => {
     const fetching = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/meeting/fetchinfo', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/meeting/fetchinfo`, {
           params: { user: user.username }
         });
         if (response.data?.meets) {
@@ -28,7 +28,7 @@ export default function Schedule() {
 
   const handleDeleteSchedule = async (itemID) => {
     try {
-      const res = await axios.delete(`http://localhost:8000/api/meeting/deleteMeeting/${itemID}`);
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/meeting/deleteMeeting/${itemID}`);
       if (res.data.status === 'Schedule removed') {
         setData(prev => prev.filter(item => item._id !== itemID));
         setAlertMsg(true);

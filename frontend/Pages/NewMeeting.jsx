@@ -36,7 +36,7 @@ export default function NewMeeting() {
       formdata.append('username', user.username);
       try {
         console.log("Sending data")
-        const response = await axios.post('http://localhost:8000/api/meeting/info',
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/meeting/info`,
           formdata
         );
         if (response.data.status === "Schedule added")

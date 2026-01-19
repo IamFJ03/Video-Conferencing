@@ -6,7 +6,7 @@ import { Home, User, Calendar, Settings, LogOut } from 'lucide-react';
 export default function sidebar() {
   const navigate = useNavigate();
   const handleLogOut = async () => {
-    const res = await axios.get("http://localhost:8000/api/authentication/logout",{
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/authentication/logout`,{
       withCredentials: true
     });
 

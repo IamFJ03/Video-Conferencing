@@ -9,8 +9,9 @@ export default function Socket({ children }) {
   const socketRef = useRef(null);
 
   if (!socketRef.current) {
-    socketRef.current = io("http://localhost:8001", {
+    socketRef.current = io(import.meta.env.VITE_API_URL, {
       transports: ["websocket"],
+      withCredentials: true,
     });
   }
 
