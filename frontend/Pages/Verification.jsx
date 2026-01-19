@@ -58,7 +58,7 @@ export default function Verification()  {
                 setMessage('Account verified successfully! Redirecting to login...');
                 setLoading(false);
                 setTimeout(() => {
-                    navigate('/home');
+                    navigate('/');
                 }, 2000);
             } else {
                 setMessage(response.data?.message || 'Verification failed. Please try again.');

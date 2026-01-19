@@ -21,7 +21,7 @@ export default function sidebar() {
         <ul className='text-white text-left py-10 px-10'>
           <li className='flex flex-row items-center'>
             <Home color="white" size={20} strokeWidth={1.5} className='mr-2' />
-            <span><Link to="/home">Home</Link></span>
+            <span><Link to="/">Home</Link></span>
           </li>
           <li className='py-10 flex flex-row items-center'>
             <Calendar color="white" size={20} strokeWidth={1.5} className='mr-2' />

@@ -86,7 +86,7 @@ export default function Authentication() {
       console.log("User Found:", response.data.newUser);
     
       await localStorage.setItem("token", response.data.token);
-      navigate(`/`, {
+      navigate(`/verification`, {
         state: {
           email: logEmail
         }

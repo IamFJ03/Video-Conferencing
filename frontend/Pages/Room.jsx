@@ -23,16 +23,16 @@ export default function Room() {
 
   const localVideoRef = useRef(null);
 
-    useEffect(() => {
+  useEffect(() => {
     const stream = streamRef.current;
     console.log("stream value", stream);
     console.log("videoRef.current.srcObject Value:", streamRef.current)
     if (stream) {
-      
+
       if (localVideoRef.current) localVideoRef.current.srcObject = stream
     }
   }, []);
-  
+
 
   const createPeer = useCallback((email) => {
     if (peersRef.current[email]) return peersRef.current[email];
@@ -91,7 +91,7 @@ export default function Room() {
       console.log("Incoming call from", from);
 
       const stream = streamRef.current;
-if (!stream) return;
+      if (!stream) return;
       const pc = createPeer(from);
 
       await pc.setRemoteDescription(offer);
