@@ -213,7 +213,7 @@ export default function Room() {
             autoPlay
             playsInline
             ref={(el) => el && (el.srcObject = stream)}
-            className="rounded-2xl ml-[5%] md:ml-0"
+            className="rounded-2xl ml-[5%] md:ml-0 max-h-80"
             style={{ width: "300px" }}
           />
         ))}
