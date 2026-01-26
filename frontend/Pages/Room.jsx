@@ -8,7 +8,7 @@ import { PhoneOff, Video, VideoOff, Mic, MicOff } from "lucide-react"
 import { useSocket } from "../Provider/Socket";
 import { useUserContext } from "../Provider/UserContext";
 import { usePeer } from "../Provider/Peer";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 
 export default function Room() {
   const { socket } = useSocket();
@@ -174,7 +174,7 @@ export default function Room() {
     setRemoteStreams({});
     socket.emit("user-left", { email: user.email });
 
-    navigate('/join-meeting')
+    navigate('/join-meeting', {replace: true})
   }
 
   const toggleMic = () => {
@@ -213,16 +213,16 @@ export default function Room() {
             autoPlay
             playsInline
             ref={(el) => el && (el.srcObject = stream)}
-            className="rounded-2xl ml-[10%] md:ml-0"
+            className="rounded-2xl ml-[5%] md:ml-0"
             style={{ width: "300px" }}
           />
         ))}
       </div>
       <div className="flex items-center gap-10 mt-5 justify-center">
-        <div className="bg-red-500 w-fit p-3 rounded-full cursor-pointer hover:bg-red-700 transition-all duration-500">
+        <div style={{backgroundColor: '#EF4444'}} className=" w-fit p-3 rounded-full cursor-pointer hover:bg-red-700 transition-all duration-500">
           <PhoneOff size={30} color="white" onClick={handleEndCall} />
         </div>
-        <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer" onClick={toggleVideo}>
+        <div style={{backgroundColor: '#E5E7EB'}} className=" w-fit p-3 rounded-full cursor-pointer" onClick={toggleVideo}>
           {
             vid
               ?
@@ -231,7 +231,7 @@ export default function Room() {
               <VideoOff size={30} color="black" />
           }
         </div>
-        <div className="bg-gray-200 w-fit p-3 rounded-full cursor-pointer" onClick={toggleMic}>
+        <div style={{backgroundColor: '#E5E7EB'}} className="w-fit p-3 rounded-full cursor-pointer" onClick={toggleMic}>
           {
             mic
               ?

@@ -131,7 +131,6 @@ io.on("connection", (socket) => {
 app.use("/api/authentication", auth);
 app.use("/api/user", person);
 app.use("/api/meeting", meet);
-
 app.use("/profile-picture", express.static(path.join(process.cwd(), "profile-picture")));
 
 server.listen(PORT, () => {

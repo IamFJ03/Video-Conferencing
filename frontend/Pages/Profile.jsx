@@ -39,7 +39,7 @@ export default function Profile() {
             <div className="flex items-center gap-3">
               {userData.profilePicture ? (
                 <img
-                  src={`http://localhost:8000/profile-picture/${userData.profilePicture}`}
+                  src={`${import.meta.env.VITE_API_URL}/profile-picture/${userData.profilePicture}`}
                   className="h-16 w-16 rounded-full object-cover"
                 />
               ) : (
