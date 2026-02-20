@@ -34,7 +34,7 @@ const login = async (req, res) => {
         let user = await User.findOne({ Email: email });
         if (user) {
             const USER = { id: user._id, username: user.Username, email: user.Email, password: user.password };
-            const token = jwt.sign(USER, jwtKey, { expiresIn: '24h' });
+            const token = jwt.sign(USER, jwtKey, { expiresIn: '10h' });
 
             res.cookie("token", token, {
                 httpOnly: true,
