@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-  import jwtDecode from "jwt-decode";
+  import {jwtDecode} from "jwt-decode";
 
-const ProtectedRoute = ({ children }) => {
+export const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuth, setIsAuth] = useState(false);
 
@@ -11,6 +11,7 @@ useEffect(() => {
 
   if (!token) {
     setLoading(false);
+    setIsAuth(false);
     return;
   }
 
@@ -35,4 +36,3 @@ useEffect(() => {
   return isAuth ? children : <Navigate to="/auth" />;
 };
 
-export default ProtectedRoute;
