@@ -11,8 +11,12 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const { user } = useUserContext();
-  setUsername(user.username);
-  setEmail(user.email);
+  useEffect(() => {
+  if (user) {
+    setUsername(user.username);
+    setEmail(user.email);
+  }
+}, [user]);
   useEffect(() => {
     const fetchData = async () => {
       try {
