@@ -9,6 +9,14 @@ import { useUserContext } from '../Provider/UserContext';
 export default function Dashboard() {
   const { setUser } = useUserContext();
   const navigate = useNavigate();
+  const handleLogOut = async () => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/authentication/logout`, {
+      withCredentials: true
+    });
+
+    if (res.data.message === "Logged Out Successfully")
+      navigate("/auth")
+  }
   useEffect(() => {
     const fetchUser = async () => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/myself`, {
@@ -29,9 +37,11 @@ export default function Dashboard() {
     <div>
       <div className='md:flex'>
         <Sidebar />
-        <div className='md:hidden bg-black h-30 absolute top-0 w-full left-0'>
-
-          <p className='font-mono text-white text-4xl pt-10'>MeetConf</p>
+        <div className='md:hidden bg-black h-30 absolute top-0 w-full left-0 flex items-center justify-between px-4'>
+          <p className='font-mono text-white text-4xl'>MeetConf</p>
+          <div onClick={handleLogOut} className='cursor-pointer'>
+            <LogOut color='white' size={24} strokeWidth={1.5} />
+          </div>
         </div>
         <div className='flex flex-col md:flex-row md:justify-center md:gap-40 mt-40 mb-20 md:mb-0 md:mt-20 md:ml-20 ml-[5%] md:flex-wrap gap-10'>
           <Link to={"/create-meeting"}><div className='h-50 md:min-w-70 w-[90%] bg-black rounded-2xl flex flex-col items-center justify-center hover:shadow-2xl hover:mt-[-20px] duration-500 hover:cursor-pointer'>
