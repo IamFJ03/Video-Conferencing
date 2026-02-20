@@ -8,8 +8,11 @@ import User from "../src/assets/User.png";
 
 export default function Profile() {
   const [userData, setUserData] = useState({});
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const { user } = useUserContext();
-
+  setUsername(user.username);
+  setEmail(user.email);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,8 +25,9 @@ export default function Profile() {
 
         if (response.data.message === 'User Data Fetched') {
           setUserData(response.data.user);
+
         }
-      } catch (e) {}
+      } catch (e) { }
     };
 
     fetchData();
@@ -47,8 +51,8 @@ export default function Profile() {
                 <img src={User} className='w-14 h-14 rounded-full' />
               )}
               <div>
-                <p className="font-bold text-lg">{user.username}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="font-bold text-lg">{username}</p>
+                <p className="text-sm text-gray-500">{email}</p>
               </div>
             </div>
 
@@ -93,7 +97,7 @@ function Info({ label, value }) {
         disabled
         value={value ?? 'N/A'}
         className="w-full bg-gray-200 rounded px-4 py-2 text-gray-600"
-        style={{backgroundColor: "#E5E7EB"}}
+        style={{ backgroundColor: "#E5E7EB" }}
       />
     </div>
   );
