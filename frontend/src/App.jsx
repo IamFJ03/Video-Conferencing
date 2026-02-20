@@ -14,7 +14,7 @@ import NewMeeting from '../Pages/NewMeeting';
 import Socket from '../Provider/Socket'
 import PeerProvider from '../Provider/Peer'
 import { UserContext } from '../Provider/UserContext';
-import ProtectedRoute from '../Pages/ProtectedRoute';
+import {ProtectedRoute} from '../Pages/ProtectedRoute';
 function App() {
 
   return (

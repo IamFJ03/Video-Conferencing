@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
@@ -18,3 +19,5 @@ const ProtectedRoute = ({ children }) => {
 
   return isAuth ? children : <Navigate to="/auth" />;
 };
+
+export default ProtectedRoute;
