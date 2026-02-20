@@ -4,6 +4,7 @@ import { useUserContext } from '../Provider/UserContext';
 import { UserCircle2Icon, MailIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import User from "../src/assets/User.png";
 
 export default function Profile() {
   const [userData, setUserData] = useState({});
@@ -43,7 +44,7 @@ export default function Profile() {
                   className="h-16 w-16 rounded-full object-cover"
                 />
               ) : (
-                <UserCircle2Icon size={56} />
+                <img src={User} className='w-14 h-14 rounded-full' />
               )}
               <div>
                 <p className="font-bold text-lg">{user.username}</p>
