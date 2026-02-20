@@ -10,7 +10,7 @@ import Profile from '../Pages/Profile';
 import Schedule from '../Pages/Schedule';
 import Setting from '../Pages/Setting';
 import NewMeeting from '../Pages/NewMeeting';
-
+import {Toaster} from 'react-hot-toast';
 import Socket from '../Provider/Socket'
 import PeerProvider from '../Provider/Peer'
 import { UserContext } from '../Provider/UserContext';
@@ -21,6 +21,7 @@ function App() {
     <Socket>
       <PeerProvider>
         <UserContext>
+          <Toaster position='top-right' />
           <Routes>
             <Route path='/auth' element={<Authentication />} />
             <Route path='/verification' element={<Verification />} />

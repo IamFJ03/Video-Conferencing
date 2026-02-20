@@ -40,12 +40,12 @@ export default function Setting() {
           <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Profile Info */}
+          
             <div className="bg-gray-100 rounded-xl p-4">
               <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
               <div className="space-y-3">
-                <Input label="Full Name" value={fullName} setValue={setFullName} />
-                <Input label="Nick Name" value={nickName} setValue={setNickName} />
+                <Input label="Full Name" value={fullName} setValue={setFullName}/>
+                <Input label="Nick Name" value={nickName} setValue={setNickName}/>
                 <Input label="Gender" value={gender} setValue={setGender} />
                 <Input label="Country" value={country} setValue={setCountry} />
                 <Input label="Language" value={language} setValue={setLanguage} />
@@ -63,10 +63,10 @@ export default function Setting() {
               <div className="bg-gray-100 rounded-xl p-4">
                 <h2 className="text-xl font-semibold mb-4">Change Password</h2>
                 <div className="space-y-3">
-                  <input className="w-full rounded p-2" placeholder="Current Password" />
+                  <input className="w-full rounded p-2 border border-gray-400" placeholder="Current Password" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input className="rounded p-2" placeholder="New Password" />
-                    <input className="rounded p-2" placeholder="Confirm Password" />
+                    <input className="rounded p-2 border border-gray-400" placeholder="New Password" />
+                    <input className="rounded p-2 border border-gray-400" placeholder="Confirm Password" />
                   </div>
                 </div>
               </div>
@@ -96,7 +96,7 @@ function Input({ label, value, setValue }) {
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-full rounded p-2"
+        className="w-full rounded p-2 border border-gray-400"
       />
     </div>
   );

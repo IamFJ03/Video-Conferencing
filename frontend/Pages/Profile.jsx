@@ -59,7 +59,6 @@ export default function Profile() {
             </Link>
           </div>
 
-          {/* Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
             <Info label="Full Name" value={userData.fullName} />
             <Info label="Nick Name" value={userData.nickName} />
@@ -69,7 +68,6 @@ export default function Profile() {
             <Info label="Contact No" value={userData.contact} />
           </div>
 
-          {/* Email Section */}
           <div>
             <p className="text-xl font-bold mb-4">My Email Address</p>
             <div className="flex items-center gap-3 mb-4">
@@ -94,6 +92,7 @@ function Info({ label, value }) {
         disabled
         value={value ?? 'N/A'}
         className="w-full bg-gray-200 rounded px-4 py-2 text-gray-600"
+        style={{backgroundColor: "#E5E7EB"}}
       />
     </div>
   );

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
-import { AlertCircle,Eye,EyeClosed } from 'lucide-react'
+import { AlertCircle, Eye, EyeClosed } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserContext } from '../Provider/UserContext';
-
+import toast from 'react-hot-toast';
 export default function Authentication() {
   const [viewType, setViewType] = useState("login");
   const [logEmail, setLogEmail] = useState("");
@@ -12,7 +12,7 @@ export default function Authentication() {
   const [username, setUsername] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
-  const[showPass, setShowPass] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -22,14 +22,24 @@ export default function Authentication() {
 
   const handleSignUp = async () => {
     try {
-      if (username === "" || logEmail === "" || logPass === "") {
-        setErrorMsg("Fill all details");
-        setShowError(true);
-        setTimeout(() => {
-          setShowError(false);
-        }, 3000);
+      if (username === "") {
+        toast.error("Username Field can't be empty");
         return;
       };
+
+      if (logEmail === "") {
+        toast.error("Email Field can't be empty");
+        return;
+      };
+      if (!validateEmail(logEmail)) {
+        toast.error("Invalid Email")
+        return
+      }
+      if (logPass === "") {
+        toast.error("Password Field can't be empty");
+        return;
+      };
+
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/Signup`, {
         username: username,
         email: logEmail,
@@ -55,36 +65,33 @@ export default function Authentication() {
     }
   }
   const handleLogin = async () => {
-    if (logEmail === "" || logPass === "") {
-      setErrorMsg("Fill all details");
-      setShowError(true);
-      setTimeout(() => {
-        setShowError(false);
-      }, 3000);
+    if (logEmail === "") {
+      toast.error("Email Field can't be empty");
       return;
+    };
+    if (!validateEmail(logEmail)) {
+      toast.error("Invalid Email")
+      return
     }
 
-    if (validateEmail(logEmail))
-      setErrorMsg("");
-    else {
-      setErrorMsg("Invalid Email Format");
-      setShowError(true);
-      setTimeout(() => {
-        setShowError(false)
-      }, 3000)
+    if (logPass === "") {
+      toast.error("Password Field can't be empty");
       return;
-    }
+    };
+
+
+
 
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/authentication/login`, {
       email: logEmail,
       password: logPass
-    },{
+    }, {
       withCredentials: true
     });
 
     if (response.data.message === "Authentication Successful") {
       console.log("User Found:", response.data.newUser);
-    
+
       await localStorage.setItem("token", response.data.token);
       navigate(`/`, {
         state: {
@@ -118,10 +125,10 @@ export default function Authentication() {
                 <input placeholder='Enter Password' type={`${showPass ? 'text' : 'password'}`} className='border-1 w-full py-1 px-2 rounded mb-5' value={logPass} onChange={(e) => setLogPass(e.target.value)} />
                 {
                   showPass
-                  ?
-                  <EyeClosed size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)}/>
-                  :
-                  <Eye size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)}/>
+                    ?
+                    <EyeClosed size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)} />
+                    :
+                    <Eye size={25} color='black' className='mb-5 absolute right-1' onClick={() => setShowPass(!showPass)} />
                 }
               </div>
               <button className='bg-black text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleLogin()}>Log In</button><br />
@@ -141,15 +148,15 @@ export default function Authentication() {
             <input placeholder='Enter Email' type='email' className='border-1 w-55 md:w-70 py-1 px-2 rounded' value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
             <p className='text-left md:ml-0 mb-2 pt-5 text-lg ml-[10%]'>Password:</p>
             <div className='flex items-center relative w-55 md:w-70 ml-[5%] md:ml-0'>
-                <input placeholder='Enter Password' type={`${showPass ? 'text' : 'password'}`} className='border-1 w-full py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} />
-                {
-                  showPass
+              <input placeholder='Enter Password' type={`${showPass ? 'text' : 'password'}`} className='border-1 w-full py-1 px-2 rounded' value={logPass} onChange={(e) => setLogPass(e.target.value)} />
+              {
+                showPass
                   ?
-                  <EyeClosed size={25} color='black' className='absolute right-3 ' onClick={() => setShowPass(!showPass)}/>
+                  <EyeClosed size={25} color='black' className='absolute right-3 ' onClick={() => setShowPass(!showPass)} />
                   :
-                  <Eye size={25} color='black' className='absolute right-1' onClick={() => setShowPass(!showPass)}/>
-                }
-              </div>
+                  <Eye size={25} color='black' className='absolute right-1' onClick={() => setShowPass(!showPass)} />
+              }
+            </div>
             <button className='bg-black text-white my-5 py-2 w-55 md:w-70 rounded-2xl hover:cursor-pointer' onClick={() => handleSignUp()}>Sign Up</button><br />
             <span>Already have an Account?</span><span className='ml-2 hover:cursor-pointer' onClick={() => setViewType("login")}>Log In</span>
           </div>
