@@ -24,7 +24,7 @@ export default function Dashboard() {
       });
 
       if (res.data.message === "Unauthorized") {
-        navigate("/auth")
+        navigate("/auth", { replace: true });
       }
 
       console.log(res.data.user)

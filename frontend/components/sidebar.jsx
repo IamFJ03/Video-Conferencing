@@ -11,7 +11,7 @@ export default function sidebar() {
     });
 
     if(res.data.message === "Logged Out Successfully")
-      navigate("/auth")
+      navigate("/auth", { replace: true });
   }
 
   return (
