@@ -9,28 +9,22 @@ import { useUserContext } from '../Provider/UserContext';
 export default function Dashboard() {
   const { setUser } = useUserContext();
   const navigate = useNavigate();
-  
   useEffect(() => {
-    const token  = localStorage.getItem("token");
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/user/myself`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    const fetchUser = async () => {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/myself`, {
+        withCredentials: true
+      });
 
-      setUser(res.data.user);
-    } catch (error) {
-      navigate("/auth");
+      if (res.data.message === "Unauthorized") {
+        navigate("/auth")
+      }
+
+      console.log(res.data.user)
+      setUser(res.data.user)
     }
-  };
 
-  fetchUser();
-}, []);
+    fetchUser();
+  }, [])
   return (
     <div>
       <div className='md:flex'>

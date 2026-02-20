@@ -13,9 +13,10 @@ import NewMeeting from '../Pages/NewMeeting';
 
 import Socket from '../Provider/Socket'
 import PeerProvider from '../Provider/Peer'
-import {UserContext} from '../Provider/UserContext';
+import { UserContext } from '../Provider/UserContext';
+import ProtectedRoute from '../Pages/ProtectedRoute';
 function App() {
-  
+
   return (
     <Socket>
       <PeerProvider>
@@ -24,7 +25,11 @@ function App() {
             <Route path='/auth' element={<Authentication />} />
             <Route path='/verification' element={<Verification />} />
             <Route path='/join-meeting' element={<Home />} />
-            <Route path='/' element={<Dashboard />} />
+            <Route path='/' element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
             <Route path='/profile' element={<Profile />} />
             <Route path='/schedule' element={<Schedule />} />
             <Route path='/setting' element={<Setting />} />

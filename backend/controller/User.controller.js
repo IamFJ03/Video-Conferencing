@@ -66,16 +66,19 @@ const fetchData = async (req, res) => {
 }
 
 const me = async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.token;
+  console.log("Cookie received:", req.cookies.token);
 
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.json({ message: "Unauthorized" });
   }
 
   try {
     const decode = jwt.verify(token, process.env.JWT_KEY);
+    console.log(decode);
     res.json({ user: decode });
   } catch (err) {
+    console.error("JWT verification failed:", err.message);
     res.status(401).json({ message: "Invalid or expired token" });
   }
 };
