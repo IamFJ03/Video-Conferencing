@@ -30,8 +30,6 @@ MeetConf is a full-stack MERN video conferencing application that enables secure
 **Real-Time Communication**
 - WebRTC
 
-## Screenshots
-
 ## 📸 Screenshots
 
 - Login Page
